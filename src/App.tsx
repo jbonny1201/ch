@@ -545,12 +545,12 @@ export default function App() {
 
               {/* Enter simple name or lookup selection */}
               <div className="mt-5 border-t-2 border-[#E2E8F0] pt-4 text-left">
-                <label className="block text-xs text-[#1E3A8A] font-black mb-2.5 text-center bg-blue-100/50 py-1 rounded-lg">
+                <label className="block text-xs text-[#1E3A8A] font-black mb-2.5 text-center bg-blue-100/50 py-1.5 rounded-lg">
                   👇 아래 명단에서 내 이름을 찾아서 콕! 터치해 주세요 👇
                 </label>
-                <div className="grid grid-cols-5 gap-2 max-h-[140px] overflow-y-auto p-2 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[300px] min-h-[160px] overflow-y-auto p-3 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200 shadow-inner">
                   {participants.length === 0 ? (
-                    <div className="col-span-5 text-center py-6 px-4 text-xs text-slate-500 font-bold">
+                    <div className="col-span-full text-center py-10 px-4 text-xs text-slate-500 font-bold">
                       등록된 어린이 이름이 없어요! 아래에서 이름을 입력하고 추가해 주세요! 👇
                     </div>
                   ) : (
@@ -566,16 +566,16 @@ export default function App() {
                             sounds.speak(`${p.name.replace(/[🧒👧🌟]/g, "").trim()} 친구 반가워요! 대작전 시작!`);
                             setGameMode("MAIN");
                           }}
-                          className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all cursor-pointer ${
+                          className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer h-20 ${
                             isActive
-                              ? "bg-[#3B82F6] text-white border-[#2563EB] scale-103 shadow-md"
-                              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                              ? "bg-[#3B82F6] text-white border-[#2563EB] scale-105 shadow-md font-extrabold"
+                              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50 shadow-sm"
                           }`}
                         >
-                          <span className="text-xl">
+                          <span className="text-2xl mb-1">
                             {p.name.includes("👧") ? "👧" : "🧒"}
                           </span>
-                          <span className="text-xs font-black mt-0.5 truncate max-w-full">
+                          <span className="text-xs sm:text-sm font-black truncate max-w-full">
                             {p.name.replace(/[🧒👧🌟]/g, "").trim()}
                           </span>
                         </button>

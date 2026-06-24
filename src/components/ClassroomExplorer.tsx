@@ -11,37 +11,45 @@ interface ClassroomExplorerProps {
 }
 
 // Sample images of recyclables that kids can quickly click to "simulate a snapshot"
+const createSvgDataUrl = (emoji: string, bgColor: string) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+    <rect width="100%" height="100%" rx="30" fill="${bgColor.replace("#", "%23")}"/>
+    <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-size="110">${emoji}</text>
+    <text x="50%" y="82%" dominant-baseline="middle" text-anchor="middle" font-size="22" font-family="sans-serif" font-weight="bold" fill="%231e293b">샘플 카드 📸</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${svg}`;
+};
+
 const SAMPLE_RECYCLABLES = [
   {
     name: "투명 페트병",
     category: "plastic",
     emoji: "🥤",
-    // Small base64 transparent pixel to satisfy the image format, or standard placeholders
-    data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    data: createSvgDataUrl("🥤", "#E0F2FE")
   },
   {
     name: "종이 상자",
     category: "paper",
     emoji: "📦",
-    data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwAEgQGAf15s9wAAAABJRU5ErkJggg=="
+    data: createSvgDataUrl("📦", "#FEF3C7")
   },
   {
     name: "흰색 우유팩",
     category: "milk_carton",
     emoji: "🥛",
-    data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    data: createSvgDataUrl("🥛", "#F0FDF4")
   },
   {
     name: "음료수 캔",
     category: "can",
     emoji: "🥫",
-    data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAEgQGAf15s9wAAAABJRU5ErkJggg=="
+    data: createSvgDataUrl("🥫", "#FEE2E2")
   },
   {
     name: "비닐 봉지",
     category: "vinyl",
     emoji: "🛍️",
-    data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAEvgGAs73s7wAAAABJRU5ErkJggg=="
+    data: createSvgDataUrl("🛍️", "#F5F3FF")
   }
 ];
 

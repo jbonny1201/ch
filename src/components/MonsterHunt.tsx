@@ -305,6 +305,11 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
 
           if (lastFrameRef.current) {
             const lastData = lastFrameRef.current;
+            if (lastData.length !== data.length) {
+              lastFrameRef.current = data;
+              requestRef.current = requestAnimationFrame(processMotionAndPhysics);
+              return;
+            }
             let totalMotionPixels = 0;
             let sumX = 0;
             let sumY = 0;
@@ -446,7 +451,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
       const dx = m.x - handPos.x;
       const dy = m.y - handPos.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      return dist < 18; // Increased hit radius from 12% to 18% for much easier captures!
+      return dist < 24; // Increased hit radius from 18% to 24% for much easier, more generous and precise hand wave captures!
     });
 
     if (found) {
@@ -463,9 +468,22 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     sounds.playChime();
     
     // Save coordinate values for future splash animation
+    // Calculate mathematically based on monster's percentage to be 100% precise and error-proof on all screens!
     const rect = e.currentTarget.parentElement?.getBoundingClientRect();
-    const x = e.clientX - (rect?.left || 0);
-    const y = e.clientY - (rect?.top || 0);
+    const stageWidth = rect?.width || 800;
+    const stageHeight = rect?.height || 520;
+    
+    let x = (m.x / 100) * stageWidth;
+    let y = (m.y / 100) * stageHeight;
+    
+    if (e && typeof e.clientX === "number" && rect) {
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      if (clickX > 0 && clickX < stageWidth && clickY > 0 && clickY < stageHeight) {
+        x = clickX;
+        y = clickY;
+      }
+    }
     
     setActiveSortingCoords({ x, y });
     
