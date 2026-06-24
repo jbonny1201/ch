@@ -315,9 +315,10 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
             let sumY = 0;
             const activeCells: { x: number; y: number }[] = [];
 
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y += 3) {
+              for (let x = 0; x < width; x += 3) {
                 const idx = (y * width + x) * 4;
+                if (idx + 2 >= data.length) continue;
                 const rDiff = Math.abs(data[idx] - lastData[idx]);
                 const gDiff = Math.abs(data[idx + 1] - lastData[idx + 1]);
                 const bDiff = Math.abs(data[idx + 2] - lastData[idx + 2]);
@@ -329,15 +330,13 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                   sumX += x;
                   sumY += y;
 
-                  if (x % 3 === 0 && y % 3 === 0) {
-                    activeCells.push({ x: (x / width) * 100, y: (y / height) * 100 });
-                  }
+                  activeCells.push({ x: (x / width) * 100, y: (y / height) * 100 });
                 }
               }
             }
 
             // If there's enough movement, calculate motion centroid coordinates
-            if (totalMotionPixels > 8) {
+            if (totalMotionPixels > 1) {
               const avgX = (sumX / totalMotionPixels / width) * 100;
               const avgY = (sumY / totalMotionPixels / height) * 100;
               

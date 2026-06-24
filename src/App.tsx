@@ -455,9 +455,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F9FF] flex items-center justify-center p-0 select-none overflow-hidden w-full">
+    <div className="min-h-screen bg-[#F0F9FF] flex items-center justify-center p-0 overflow-y-auto w-full">
       {/* Landscape Tablet Frame (Borderless design perfectly sized for iPad landscape - expanded width) */}
-      <div className="w-full max-w-[1180px] aspect-[16/10] h-full md:h-[737px] bg-[#F0F9FF] text-[#1E293B] font-sans flex flex-col justify-between overflow-hidden relative">
+      <div className="w-full max-w-[1280px] md:min-h-[820px] bg-[#F0F9FF] text-[#1E293B] font-sans flex flex-col justify-between overflow-hidden relative rounded-3xl shadow-2xl border-4 border-[#3B82F6]/10">
       
       {/* Navigation Top Header */}
       <h1 className="sr-only">땅별마을 분리수거 챌린지</h1>
@@ -548,7 +548,7 @@ export default function App() {
                 <label className="block text-xs text-[#1E3A8A] font-black mb-2.5 text-center bg-blue-100/50 py-1.5 rounded-lg">
                   👇 아래 명단에서 내 이름을 찾아서 콕! 터치해 주세요 👇
                 </label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[300px] min-h-[160px] overflow-y-auto p-3 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200 shadow-inner">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[300px] min-h-[160px] overflow-y-auto p-3 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200 shadow-inner custom-scrollbar touch-pan-y">
                   {participants.length === 0 ? (
                     <div className="col-span-full text-center py-10 px-4 text-xs text-slate-500 font-bold">
                       등록된 어린이 이름이 없어요! 아래에서 이름을 입력하고 추가해 주세요! 👇

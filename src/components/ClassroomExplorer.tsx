@@ -13,11 +13,11 @@ interface ClassroomExplorerProps {
 // Sample images of recyclables that kids can quickly click to "simulate a snapshot"
 const createSvgDataUrl = (emoji: string, bgColor: string) => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
-    <rect width="100%" height="100%" rx="30" fill="${bgColor.replace("#", "%23")}"/>
+    <rect width="100%" height="100%" rx="30" fill="${bgColor}"/>
     <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-size="110">${emoji}</text>
-    <text x="50%" y="82%" dominant-baseline="middle" text-anchor="middle" font-size="22" font-family="sans-serif" font-weight="bold" fill="%231e293b">샘플 카드 📸</text>
+    <text x="50%" y="82%" dominant-baseline="middle" text-anchor="middle" font-size="22" font-family="sans-serif" font-weight="bold" fill="#1e293b">샘플 카드 📸</text>
   </svg>`;
-  return `data:image/svg+xml;utf8,${svg}`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 };
 
 const SAMPLE_RECYCLABLES = [

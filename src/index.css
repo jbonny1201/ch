@@ -44,3 +44,26 @@
 .animate-sweep {
   animation: sweep 3s infinite ease-in-out;
 }
+
+/* Custom scrollbar to make it extremely visible and thick enough to easily scroll on tablets/touchscreens */
+.custom-scrollbar {
+  scrollbar-width: auto;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+  display: block !important;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 9999px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 9999px !important;
+  border: 2px solid #f1f5f9 !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}

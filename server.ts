@@ -222,7 +222,8 @@ CRITICAL CLASSIFICATION MAPPING LAWS:
 2. "vinyl" (비닐) is separate from "plastic" (플라스틱). Thin flexible bags and snack bags are "vinyl".
 3. Check the shape, color, text, and materials in the image. Give the correct category.
 4. If the image is ambiguous, blurry, dark, contains multiple things, or has solid/minimal colors, you MUST strongly lean on the user hint / context: "${itemHint || 'none'}".
-5. Answer in a loving, cute, conversational Korean tone suitable for a 5-year-old child! Use cute exclamation points and make them feel proud!${hintText}`,
+5. Answer in a loving, cute, conversational Korean tone suitable for a 5-year-old child! Use cute exclamation points and make them feel proud!
+6. BE EXTREMELY GENEROUS AND LENIENT when identifying items from the kid's camera. Since this is an educational game for 5-7 year olds, if an image is blurry, contains a hand holding something, or shows any household container or wrapping, do your absolute best to classify it into one of the recyclable categories ('plastic', 'paper', 'can', 'milk_carton', 'vinyl') instead of 'other' (unrecyclable), unless it is clearly food waste, hazardous, or completely empty space. Let's encourage them to be recycling heroes!${hintText}`,
     };
 
     const response = await ai.models.generateContent({
