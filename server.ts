@@ -26,7 +26,7 @@ const ai = new GoogleGenAI({
 // API endpoint to analyze trash image
 app.post("/api/analyze-trash", async (req, res) => {
   try {
-    const { image, mimeType } = req.body;
+    const { image, mimeType, itemHint } = req.body;
 
     if (!image) {
       return res.status(400).json({ error: "이미지 데이터가 필요합니다." });
@@ -36,8 +36,8 @@ app.post("/api/analyze-trash", async (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
       console.warn("⚠️ Warning: GEMINI_API_KEY is not defined in environment variables. Falling back to simulator.");
       
-      const fallbacks = [
-        {
+      const fallbacks: Record<string, any> = {
+        plastic: {
           category: "plastic",
           itemName: "맑은 생수 페트병 (시뮬레이션)",
           recyclable: true,
@@ -46,7 +46,7 @@ app.post("/api/analyze-trash", async (req, res) => {
           monsterName: "플라스틱 괴물",
           simulated: true
         },
-        {
+        paper: {
           category: "paper",
           itemName: "달콤한 과자 종이상자 (시뮬레이션)",
           recyclable: true,
@@ -55,7 +55,7 @@ app.post("/api/analyze-trash", async (req, res) => {
           monsterName: "종이 괴물",
           simulated: true
         },
-        {
+        can: {
           category: "can",
           itemName: "시원한 콜라 캔 (시뮬레이션)",
           recyclable: true,
@@ -64,7 +64,7 @@ app.post("/api/analyze-trash", async (req, res) => {
           monsterName: "캔 괴물",
           simulated: true
         },
-        {
+        milk_carton: {
           category: "milk_carton",
           itemName: "고소한 흰 우유팩 (시뮬레이션)",
           recyclable: true,
@@ -73,7 +73,7 @@ app.post("/api/analyze-trash", async (req, res) => {
           monsterName: "우유갑 괴물",
           simulated: true
         },
-        {
+        vinyl: {
           category: "vinyl",
           itemName: "투명 과일 비닐봉지 (시뮬레이션)",
           recyclable: true,
@@ -81,11 +81,27 @@ app.post("/api/analyze-trash", async (req, res) => {
           childExplanation: "바스락바스락 비닐봉지군요! 비닐 안에 이물질이 남아있지 않게 확인하고 비닐류 전용 분리수거함에 바람을 빼서 납작하게 넣어주세요!",
           monsterName: "비닐 괴물",
           simulated: true
+        },
+        other: {
+          category: "other",
+          itemName: "남아있는 사과심 (시뮬레이션)",
+          recyclable: false,
+          points: 0,
+          childExplanation: "어라라! 먹다 남은 과일 씨앗이나 음식물은 일반 쓰레기통이나 음식물 쓰레기통에 고이 버려주어야 해요! 분리수거함에는 넣으면 안 된답니다!",
+          monsterName: "먼지 괴물",
+          simulated: true
         }
-      ];
+      };
 
-      const randomIndex = Math.floor(Math.random() * fallbacks.length);
-      const chosenFallback = fallbacks[randomIndex];
+      // If we have an exact matching hint, use it for 100% accurate classification
+      if (itemHint && fallbacks[itemHint]) {
+        return res.json(fallbacks[itemHint]);
+      }
+
+      // Otherwise select a random category (excluding other for standard fallback flow)
+      const keys = ["plastic", "paper", "can", "milk_carton", "vinyl"];
+      const randomIndex = Math.floor(Math.random() * keys.length);
+      const chosenFallback = fallbacks[keys[randomIndex]];
       return res.json(chosenFallback);
     }
 
@@ -109,18 +125,28 @@ app.post("/api/analyze-trash", async (req, res) => {
       },
     };
 
+    let hintText = "";
+    if (itemHint && itemHint !== "camera") {
+      hintText = `\nContext/User Suggestion: The user is likely presenting a recyclable item of category "${itemHint}". Use this as a strong contextual guide for your classification, but prioritize visual properties if the image clearly displays a different type of waste.`;
+    }
+
     const textPart = {
       text: `You are an expert AI trash recycling counselor for kids aged 5 to 7. Your name is '달님' (Moon).
 Analyze the child's camera image and determine if it represents a recyclable object that is often found in classrooms or households, specifically focusing on these categories:
-- plastic (플라스틱)
-- paper (종이)
-- can (캔)
-- milk_carton (우유팩)
-- vinyl (비닐)
-- other (기타 일반쓰레기 / 비재활용품)
+- plastic: 플라스틱 (PET bottles, plastic cups, containers, yogurt bottles)
+- paper: 종이 (cardboard boxes, paper sheets, cups, bags, notebooks)
+- can: 캔 (soda cans, tin cans, aluminum/steel beverage containers)
+- milk_carton: 우유팩 (specifically milk cartons, juice packs with fold-open paperboard tops)
+- vinyl: 비닐 (snack wrappers, plastic shopping bags, bubble wrap, thin plastic wrappers)
+- other: 기타 일반쓰레기 (general non-recyclable waste, toys, scissors, food waste like apple cores, tissues, wet wipes)
 
-Identify the specific physical item in Korean (e.g. '페트병', '골판지 상자', '캔 맥주/음료수', '우유갑', '비닐 과자봉지').
-Then offer high-quality kid-friendly instructions in active, soft, conversational Korean. Explain why/how to clean, strip label, or sort it. It must be sweet and match a 5-year-old's vocabulary level! Use exclamation marks and encouraging phrases!`,
+CRITICAL RULES FOR RECYCLABLE CLASSIFICATION:
+1. "milk_carton" (우유팩/종이팩) is separate from "paper" (일반 종이). Do NOT classify juice or milk boxes as general "paper" (종이). They belong to "milk_carton"!
+2. "vinyl" (비닐) is separate from "plastic" (플라스틱). Thin, crinkly snack bags, plastic wrappers, and shopping bags are "vinyl", not "plastic".
+3. Look extremely closely at the item in the image. Identify its specific name in Korean (e.g., '맑은 생수 페트병', '상자 종이갑', '시원한 알루미늄 캔', '우유갑', '비닐 봉지').
+4. If the image is a plain colored square (placeholder) or a sample card, classify it exactly according to its name/category. Do not default to "plastic"!${hintText}
+
+Offer high-quality kid-friendly instructions in active, soft, conversational Korean. Explain why/how to clean, strip label, or sort it. It must be sweet and match a 5-year-old's vocabulary level! Use exclamation marks and encouraging phrases!`,
     };
 
     const response = await ai.models.generateContent({

@@ -20,6 +20,12 @@ const SAMPLE_RECYCLABLES = [
     data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
   },
   {
+    name: "종이 상자",
+    category: "paper",
+    emoji: "📦",
+    data: "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwAEgQGAf15s9wAAAABJRU5ErkJggg=="
+  },
+  {
     name: "흰색 우유팩",
     category: "milk_carton",
     emoji: "🥛",
@@ -154,12 +160,16 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
     
     // We send a small prompt to represent the simulated item to Gemini to make a REAL Gemini call so we never mock if we have the key!
     try {
+      const matchedSample = SAMPLE_RECYCLABLES.find(s => s.category === item.category);
+      const imageData = matchedSample ? matchedSample.data : "data:image/png;base64,iVBOR0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
       const response = await fetch("/api/analyze-trash", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image: item.id === "pet_bottle" ? SAMPLE_RECYCLABLES[0].data : SAMPLE_RECYCLABLES[1].data,
-          mimeType: "image/png"
+          image: imageData,
+          mimeType: "image/png",
+          itemHint: item.category
         }),
       });
 
@@ -524,7 +534,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                         ref={videoRef}
                         playsInline
                         muted
-                        className="w-full h-full object-cover min-h-[280px]"
+                        className="w-full h-full object-cover min-h-[280px] transform scale-x-[-1]"
                       />
                       
                       {/* Hands-Free Automated Capture Countdown Overlay */}
@@ -568,7 +578,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
               {/* Sample recyclable generator cards for debug/convenience */}
               <div className="w-full mt-4 bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                 <span className="text-xs font-semibold text-slate-400 block mb-2 text-center">💡 소품이 없을 때 빠른 체험용 샘플 카드:</span>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   {SAMPLE_RECYCLABLES.map((sample, idx) => (
                     <button
                       key={idx}
@@ -581,7 +591,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                           const res = await fetch("/api/analyze-trash", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ image: sample.data, mimeType: "image/png" })
+                            body: JSON.stringify({ image: sample.data, mimeType: "image/png", itemHint: sample.category })
                           });
                           if (res.ok) {
                             const data = await res.json();

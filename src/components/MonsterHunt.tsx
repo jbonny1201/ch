@@ -144,7 +144,7 @@ const MONSTER_PROFILES: Record<CategoryType, { name: string; color: string; emoj
 
 export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCaptured, onClose }: MonsterHuntProps) {
   const [monsters, setMonsters] = useState<Monster[]>([]);
-  const [timeLeft, setTimeLeft] = useState(40); // Set to 40 seconds as requested!
+  const [timeLeft, setTimeLeft] = useState(20); // Set to 20 seconds as requested!
   const [scoreEarned, setScoreEarned] = useState(0);
   const [capturedCount, setCapturedCount] = useState(0); // Track total count of captured items
   const [isGameOver, setIsGameOver] = useState(false); // Game over status indicator
@@ -249,7 +249,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     // Audio guidance
     sounds.playFail(); // Rumble sound for monster spawn
     setTimeout(() => {
-      sounds.speak(`반짝반짝 쓰레기들이 하늘에서 내려옵니다! 카메라 앞에서 손을 흔들거나 직접 터치해서 제한시간 40초 동안 많이 잡아주세요!`);
+      sounds.speak(`반짝반짝 쓰레기들이 하늘에서 내려옵니다! 카메라 앞에서 손을 흔들거나 직접 터치해서 제한시간 20초 동안 많이 잡아주세요!`);
     }, 400);
 
     return () => {
@@ -336,8 +336,8 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               const avgX = (sumX / totalMotionPixels / width) * 100;
               const avgY = (sumY / totalMotionPixels / height) * 100;
               
-              // Use unmirrored raw X coordinate so tracking perfectly follows unmirrored camera stream
-              const trackedX = avgX;
+              // Mirror the X coordinate to match the mirrored camera display
+              const trackedX = 100 - avgX;
 
               setHandPos((prev) => {
                 if (!prev) return { x: trackedX, y: avgY };
@@ -394,7 +394,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                        m.type === "milk_carton" ? "우유팩 괴물" :
                        m.type === "vinyl" ? "비닐 괴물" : "일반 쓰레기 괴물";
                        
-    sounds.speak(`손으로 ${KoreanType} 퇴치! +${m.points} 에너지!`);
+    // sounds.speak(`손으로 ${KoreanType} 퇴치! +${m.points} 에너지!`);
 
     const popupId = `popup-${Date.now()}-${Math.random()}`;
     setCapturePopups((prev) => [
@@ -475,7 +475,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                        m.type === "milk_carton" ? "우유팩 괴물" :
                        m.type === "vinyl" ? "비닐 괴물" : "일반 쓰레기 괴물";
                        
-    sounds.speak(`터치로 ${KoreanType} 퇴치! +${m.points} 에너지!`);
+    // sounds.speak(`터치로 ${KoreanType} 퇴치! +${m.points} 에너지!`);
 
     const popupId = `popup-${Date.now()}-${Math.random()}`;
     setCapturePopups((prev) => [
@@ -656,7 +656,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
             ref={videoRef}
             playsInline
             muted
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-50 z-0 bg-slate-900"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-50 z-0 bg-slate-900 transform scale-x-[-1]"
           />
 
           {/* Hidden Canvas for real time pixel differencing math */}
@@ -667,7 +667,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
             <div
               key={`motion-dot-${idx}`}
               className="absolute w-2 h-2 bg-[#10B981]/50 border border-[#34D399]/40 rounded-full animate-ping pointer-events-none z-10"
-              style={{ left: `${cell.x}%`, top: `${cell.y}%` }}
+              style={{ left: `${100 - cell.x}%`, top: `${cell.y}%` }}
             />
           ))}
 
