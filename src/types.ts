@@ -54,7 +54,7 @@ export const STICKER_LIST: Sticker[] = [
     id: "moon_sticker",
     name: "달님 스티커",
     description: "첫 번째 분리수거 물건을 성공적으로 찾아서 촬영했을 때 달님에게 받은 격려 스티커!",
-    emoji: "🌙",
+    emoji: "🌕",
   },
   {
     id: "truck_sticker",

@@ -357,8 +357,8 @@ export default function App() {
           <div className="absolute top-0 right-1/4 text-4xl animate-puff-1 select-none pointer-events-none">💨</div>
           <div className="absolute top-4 right-1/3 text-3xl animate-puff-2 select-none pointer-events-none">💨</div>
           
-          {/* Sad crying trash truck */}
-          <div className="text-[120px] filter saturate-50 brightness-75 translate-y-1 select-none animate-bounce duration-1000">
+          {/* Sad crying trash truck - gentle wiggle instead of jumping bounce */}
+          <div className="text-[120px] filter saturate-50 brightness-75 translate-y-1 select-none animate-pulse duration-1000">
             🚛
           </div>
           <span className="text-4xl absolute bottom-1/3 left-1/2 transform -translate-x-1/2 select-none">😭</span>
@@ -374,7 +374,7 @@ export default function App() {
         <div className="relative flex flex-col items-center">
           
           {/* Tiny wind puffs */}
-          <div className="absolute top-2 right-1/4 text-xl opacity-60 animate-bounce select-none pointer-events-none">💨</div>
+          <div className="absolute top-2 right-1/4 text-xl opacity-60 select-none pointer-events-none">💨</div>
           
           {/* Subtle vibration wiggle body */}
           <div className="text-[120px] transition duration-500 animate-float select-none">
@@ -416,7 +416,7 @@ export default function App() {
         <div className="relative flex flex-col items-center">
           
           {/* Sparkling yellow stars */}
-          <div className="absolute -top-4 left-1/4 text-2xl animate-bounce">⭐</div>
+          <div className="absolute -top-4 left-1/4 text-2xl animate-pulse">⭐</div>
           <div className="absolute top-2 right-1/4 text-2xl animate-ping">✨</div>
  
           <div className="text-[120px] scale-105 select-none animate-float">
@@ -435,7 +435,7 @@ export default function App() {
         <div className="relative flex flex-col items-center">
           
           {/* Floating crown over the truck */}
-          <div className="absolute -top-8 text-5xl animate-bounce select-none z-10">👑</div>
+          <div className="absolute -top-8 text-5xl animate-pulse select-none z-10">👑</div>
           <div className="absolute top-2 left-6 text-2xl animate-ping text-pink-500">❤️</div>
           <div className="absolute top-0 right-6 text-2xl animate-ping text-yellow-300">⭐</div>
  
@@ -454,8 +454,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F0F9FF] flex items-center justify-center p-0 select-none overflow-hidden w-full">
-      {/* Landscape Tablet Frame (Borderless design perfectly sized for iPad landscape) */}
-      <div className="w-full max-w-[1024px] aspect-[4/3] h-full md:h-[768px] bg-[#F0F9FF] text-[#1E293B] font-sans flex flex-col justify-between overflow-hidden relative">
+      {/* Landscape Tablet Frame (Borderless design perfectly sized for iPad landscape - expanded width) */}
+      <div className="w-full max-w-[1180px] aspect-[16/10] h-full md:h-[737px] bg-[#F0F9FF] text-[#1E293B] font-sans flex flex-col justify-between overflow-hidden relative">
       
       {/* Navigation Top Header */}
       <h1 className="sr-only">땅별마을 분리수거 챌린지</h1>
@@ -512,11 +512,11 @@ export default function App() {
               exit={{ opacity: 0, y: -15 }}
               className="max-w-xl mx-auto w-full p-8 my-10 bg-white rounded-[2.5rem] border-4 border-[#3B82F6] shadow-2xl relative text-center overflow-hidden bg-gradient-to-b from-[#E0F2FE] via-white to-white"
             >
-              <div className="absolute top-2 left-2 text-6xl opacity-10 pointer-events-none">🌙</div>
+              <div className="absolute top-2 left-2 text-6xl opacity-10 pointer-events-none">🌕</div>
               
-              {/* Moon dialogue speaker avatar */}
-              <div className="w-24 h-24 bg-gradient-to-tr from-[#FFF9C4] to-[#FBC02D] text-slate-900 text-4xl font-sans font-black mx-auto rounded-full flex items-center justify-center animate-bounce shadow-xl border-4 border-white ring-4 ring-[#FBC02D] relative">
-                🌙
+              {/* Moon dialogue speaker avatar - Full Moon with gentle pulse animation instead of bounce */}
+              <div className="w-24 h-24 bg-gradient-to-tr from-[#FFF9C4] to-[#FBC02D] text-slate-900 text-4xl font-sans font-black mx-auto rounded-full flex items-center justify-center animate-pulse shadow-xl border-4 border-white ring-4 ring-[#FBC02D] relative">
+                🌕
                 <span className="absolute -bottom-1 right-0 text-lg">💬</span>
               </div>
 
@@ -814,7 +814,7 @@ export default function App() {
               {/* STAGES CHANGER */}
               {vsPhase === "INTRO" && (
                 <div className="max-w-md bg-slate-900 rounded-3xl border border-slate-700 p-6 text-center shadow-2xl relative z-10">
-                  <span className="text-5xl block animate-bounce mb-3">🎮</span>
+                  <span className="text-5xl block animate-pulse mb-3">🎮</span>
                   <h4 className="text-xl font-extrabold text-yellow-350">게임 규칙 설명</h4>
                   
                   <div className="my-4 bg-slate-950 p-4 rounded-xl text-xs text-slate-300 leading-relaxed text-left">
@@ -836,7 +836,7 @@ export default function App() {
 
               {vsPhase === "P2_INTRO" && (
                 <div className="max-w-md bg-slate-900 rounded-3xl border border-slate-700 p-6 text-center shadow-2xl relative z-10">
-                  <span className="text-5xl block animate-bounce mb-3">🔄</span>
+                  <span className="text-5xl block animate-pulse mb-3">🔄</span>
                   <h4 className="text-xl font-extrabold text-yellow-350">공수 교대!</h4>
                   <p className="text-xs text-slate-350 my-3">
                     {p1State.name} 선수가 무려 <strong className="text-yellow-300">{p1State.score} 에너지 점수</strong>를 획득하는 발군의 성적을 거두었습니다! 아주 잘했어요!
@@ -891,7 +891,7 @@ export default function App() {
                         id={`vs-monster-btn-${m.id}`}
                         className="absolute p-2 transform -translate-x-1/2 -translate-y-1/2 hover:scale-115 transition"
                       >
-                        <span className="text-4xl block animate-bounce">
+                        <span className="text-4xl block animate-pulse">
                           {m.type === "plastic" ? "🥤" : m.type === "paper" ? "📦" : m.type === "can" ? "🥫" : m.type === "milk_carton" ? "🥛" : "🛍️"}
                         </span>
                       </button>
@@ -910,7 +910,7 @@ export default function App() {
                 <div className="max-w-lg bg-slate-900 rounded-3xl border-2 border-yellow-450 p-6 text-center shadow-2xl relative z-10 my-6">
                   
                   {/* Winner designator */}
-                  <div className="text-5xl animate-bounce mb-2">⭐ 🏆 ⭐</div>
+                  <div className="text-5xl mb-2">⭐ 🏆 ⭐</div>
                   
                   <h4 className="text-2xl font-black text-yellow-350">최종 대결 판정 결과 발표!</h4>
                   <p className="text-xs text-slate-400 mt-0.5 mb-5">고장 난 지구를 청소해준 대전 결과입니다.</p>

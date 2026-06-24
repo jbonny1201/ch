@@ -230,7 +230,13 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
       
       const ctx = canvas.getContext("2d");
       if (ctx) {
+        // Mirror the canvas horizontally so the captured photo matches the mirrored screen preview
+        ctx.save();
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        
         const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
         setUploadPreview(dataUrl);
 
@@ -449,7 +455,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                     className={`absolute p-3 rounded-full transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 z-20 shadow-md ${
                       item.found 
                         ? "bg-slate-800/80 text-gray-500 border border-slate-700 line-through scale-90" 
-                        : "bg-white text-slate-900 border-2 border-yellow-450 hover:scale-125 animate-bounce"
+                        : "bg-white text-slate-900 border-2 border-yellow-450 hover:scale-125 hover:rotate-3"
                     }`}
                   >
                     <span className="text-2xl block">{item.found ? "✅" : item.emoji}</span>
@@ -519,7 +525,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                           dragActive ? "border-yellow-450 bg-slate-900" : "border-slate-700 hover:border-slate-500"
                         }`}
                       >
-                        <Upload className="text-slate-450 mb-2 animate-bounce" size={32} />
+                        <Upload className="text-slate-450 mb-2 animate-pulse" size={32} />
                         <span className="text-sm font-semibold text-slate-300 mb-1">인터넷 브라우저 사진 끌어놓기</span>
                         <span className="text-xs text-slate-500 mb-3">(페트병, 캔, 종이 등 사진 업로드 가능)</span>
                         <label className="px-4 py-1.5 bg-yellow-450 text-slate-900 rounded-full text-xs font-bold ring-2 ring-yellow-400 cursor-pointer hover:bg-yellow-400">
@@ -534,7 +540,8 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                         ref={videoRef}
                         playsInline
                         muted
-                        className="w-full h-full object-cover min-h-[280px] transform scale-x-[-1]"
+                        className="w-full h-full object-cover min-h-[280px]"
+                        style={{ transform: "scaleX(-1)" }}
                       />
                       
                       {/* Hands-Free Automated Capture Countdown Overlay */}
@@ -543,7 +550,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                           <div className="bg-slate-900/95 border-3 border-emerald-400 p-5 rounded-3xl flex flex-col items-center justify-center shadow-2xl max-w-xs text-center">
                             <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-1">🤖 인공지능 자동 물체 스캐너</span>
                             <div className="flex items-center space-x-3 mb-2.5">
-                              <div className="w-14 h-14 bg-emerald-400 text-slate-950 font-black rounded-full flex items-center justify-center text-3xl shadow-lg border-2 border-white animate-bounce">
+                              <div className="w-14 h-14 bg-emerald-400 text-slate-950 font-black rounded-full flex items-center justify-center text-3xl shadow-lg border-2 border-white animate-pulse">
                                 {autoScanCountdown}
                               </div>
                               <span className="text-sm font-black text-white text-left">초 후에<br />자동으로 찰칵! 📸</span>
@@ -630,7 +637,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                   <div className="w-16 h-16 border-4 border-yellow-350 border-t-transparent rounded-full animate-spin" />
                   <Sparkles className="text-yellow-400 absolute animate-pulse" size={24} />
                 </div>
-                <h3 className="text-lg font-bold text-yellow-300 animate-bounce">달님이 우주 돋보기로 사진을 읽고 있어요</h3>
+                <h3 className="text-lg font-bold text-yellow-300 animate-pulse">달님이 우주 돋보기로 사진을 읽고 있어요</h3>
                 <p className="text-xs text-slate-400 max-w-xs mt-2">
                   "어디 보자... 어떤 멋진 분리수거 물품을 친구가 보여줬을까요? 귀여운 괴물들을 탐색하는 중이에요!"
                 </p>
@@ -646,7 +653,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
             
             {!selectedItem && !aiFeedback && (
               <div className="text-center py-12 text-slate-400 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
-                <HelpCircle size={44} className="mx-auto text-yellow-350 mb-3 animate-bounce" />
+                <HelpCircle size={44} className="mx-auto text-yellow-350 mb-3 animate-pulse" />
                 <p className="text-sm font-bold text-slate-200">분석된 쓰레기가 아직 없어요</p>
                 <p className="text-xs mt-1.5 text-slate-400 leading-normal">
                   왼쪽 카메라 화면을 보고 <strong className="text-yellow-400">찰칵! 촬영하기</strong> 버튼을 누르거나, <strong className="text-yellow-400">파일 업로드</strong> 또는 <strong className="text-yellow-400">샘플 카드</strong>를 누르면 AI 분석이 시작돼요!
@@ -717,7 +724,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
 
                 {/* Kid instructions */}
                 <div className="bg-slate-950/80 p-3 rounded-lg text-slate-200 text-xs leading-relaxed mb-1 border border-slate-800">
-                  <span className="text-xl block mb-1">🌙 달님의 재활용 비법:</span>
+                  <span className="text-xl block mb-1">🌕 달님의 재활용 비법:</span>
                   <p className="font-medium">{aiFeedback.childExplanation}</p>
                 </div>
 

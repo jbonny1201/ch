@@ -103,7 +103,7 @@ const MONSTER_PROFILES: Record<CategoryType, { name: string; color: string; emoj
     emoji: "🛍️",
     desc: "바스락바스락 골목바람에 떠돌아다니는 가벼운 비닐 구신!",
     svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full animate-bounce">
+      <svg viewBox="0 0 100 100" className="w-full h-full animate-pulse">
         {/* Crinkle ears and body */}
         <path d="M 15,15 Q 30,35 50,20 Q 70,35 85,15 L 75,75 Q 50,95 25,75 Z" fill="#c084fc" />
         {/* Goofy spiraled eyes */}
@@ -144,7 +144,7 @@ const MONSTER_PROFILES: Record<CategoryType, { name: string; color: string; emoj
 
 export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCaptured, onClose }: MonsterHuntProps) {
   const [monsters, setMonsters] = useState<Monster[]>([]);
-  const [timeLeft, setTimeLeft] = useState(20); // Set to 20 seconds as requested!
+  const [timeLeft, setTimeLeft] = useState(15); // Set to 15 seconds as requested!
   const [scoreEarned, setScoreEarned] = useState(0);
   const [capturedCount, setCapturedCount] = useState(0); // Track total count of captured items
   const [isGameOver, setIsGameOver] = useState(false); // Game over status indicator
@@ -249,7 +249,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     // Audio guidance
     sounds.playFail(); // Rumble sound for monster spawn
     setTimeout(() => {
-      sounds.speak(`반짝반짝 쓰레기들이 하늘에서 내려옵니다! 카메라 앞에서 손을 흔들거나 직접 터치해서 제한시간 20초 동안 많이 잡아주세요!`);
+      sounds.speak(`반짝반짝 쓰레기들이 하늘에서 내려옵니다! 카메라 앞에서 손을 흔들거나 직접 터치해서 제한시간 15초 동안 많이 잡아주세요!`);
     }, 400);
 
     return () => {
@@ -656,7 +656,8 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
             ref={videoRef}
             playsInline
             muted
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-50 z-0 bg-slate-900 transform scale-x-[-1]"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-50 z-0 bg-slate-900"
+            style={{ transform: "scaleX(-1)" }}
           />
 
           {/* Hidden Canvas for real time pixel differencing math */}
@@ -691,7 +692,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               <div className="w-4 h-4 bg-rose-500 rounded-full border-2 border-white absolute animate-ping z-20" />
               <div className="w-3 h-3 bg-rose-600 rounded-full border border-white absolute z-20 shadow-md" />
 
-              <span className="text-4xl z-10 filter drop-shadow-md animate-bounce">✋</span>
+              <span className="text-4xl z-10 filter drop-shadow-md animate-pulse">✋</span>
               <span className="absolute -bottom-8 bg-slate-900 border-2 border-emerald-400 text-emerald-300 font-sans text-[10px] font-black px-2 py-0.5 rounded shadow-lg whitespace-nowrap flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-[#EF4444] rounded-full animate-ping" />
                 <span>지키미 동작 인식 중 ✋</span>
@@ -736,7 +737,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                     {MONSTER_PROFILES[m.type].svg}
                     
                     {/* Extra clear, bouncing emoji bubble for immediate visual recognition! */}
-                    <div className="absolute -top-3.5 -right-3.5 w-10 h-10 rounded-full bg-white border-3 border-emerald-400 flex items-center justify-center text-xl shadow-lg z-30 animate-bounce">
+                    <div className="absolute -top-3.5 -right-3.5 w-10 h-10 rounded-full bg-white border-3 border-emerald-400 flex items-center justify-center text-xl shadow-lg z-30 animate-pulse">
                       {MONSTER_PROFILES[m.type].emoji}
                     </div>
                   </div>
@@ -776,7 +777,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                 시간이 마감되었어요!
               </h4>
               <p className="text-slate-300 text-xs max-w-sm mt-1 mb-5 leading-relaxed">
-                40초 동안 하늘에서 내려온 쓰레기들을 정말 열심히 분리 정화했군요! 지구 지키기 성공이에요!
+                15초 동안 하늘에서 내려온 쓰레기들을 정말 열심히 분리 정화했군요! 지구 지키기 성공이에요!
               </p>
 
               <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center space-x-4 mb-6">
