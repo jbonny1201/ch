@@ -1,0 +1,10 @@
+{
+  "name": "땅별마을 분리수거 챌린지",
+  "description": "교실 속 분리수거 물품을 촬영하고 AR로 쓰레기 괴물을 잡아 고장난 쓰레기차를 충전하는 유아용 환경 교육 게임",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
