@@ -498,6 +498,19 @@ export default function App() {
           >
             교사용 모드 👩‍🏫
           </button>
+
+          {/* Back to Intro screen button */}
+          {gameMode !== "INTRO" && (
+            <button
+              onClick={() => {
+                sounds.playPop();
+                setGameMode("INTRO");
+              }}
+              className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border-2 border-amber-250 font-black rounded-xl text-xs transition shadow-sm active:translate-y-0.5"
+            >
+              🏠 처음 화면
+            </button>
+          )}
         </div>
       </header>
 

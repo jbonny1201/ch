@@ -248,9 +248,6 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
 
     // Audio guidance
     sounds.playFail(); // Rumble sound for monster spawn
-    setTimeout(() => {
-      sounds.speak(`반짝반짝 쓰레기들이 하늘에서 내려옵니다! 카메라 앞에서 손을 흔들거나 직접 터치해서 제한시간 15초 동안 많이 잡아주세요!`);
-    }, 400);
 
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);

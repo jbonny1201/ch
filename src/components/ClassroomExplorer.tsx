@@ -493,108 +493,117 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
               </button>
             </div>
           ) : (
-            /* Camera/Upload Mode */
-            <div className="flex-1 flex flex-col p-4 relative justify-center items-center">
-              {uploadPreview ? (
-                /* Photo preview and cancel */
-                <div className="w-full h-full flex flex-col items-center justify-center">
-                  <img
-                    src={uploadPreview}
-                    alt="Scan snapshot"
-                    className="max-h-[290px] rounded-lg border border-slate-700 object-contain shadow-lg"
-                  />
-                  <button
-                    onClick={() => {
-                      sounds.playPop();
-                      setUploadPreview(null);
-                      setAiFeedback(null);
-                      setAutoScanCountdown(5); // Reset automated snapshot countdown!
-                      startCamera();
-                    }}
-                    className="mt-3 flex items-center space-x-2 px-4 py-2 bg-slate-800 text-sm hover:bg-slate-700 text-yellow-300 rounded-full"
-                  >
-                    <RefreshCw size={15} />
-                    <span>다시 촬영하기</span>
-                  </button>
-                </div>
-              ) : (
-                /* Live Video Window */
-                <div className="w-full flex-1 flex flex-col items-center justify-center relative bg-black rounded-lg overflow-hidden">
-                  {cameraError ? (
-                    <div className="p-6 text-center max-w-sm">
-                      <p className="text-yellow-400 mb-4">{cameraError}</p>
-                      
-                      {/* Drag & Drop Area */}
-                      <div
-                        onDragEnter={handleDrag}
-                        onDragOver={handleDrag}
-                        onDragleave={handleDrag}
-                        onDrop={handleDrop}
-                        className={`w-full p-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all ${
-                          dragActive ? "border-yellow-450 bg-slate-900" : "border-slate-700 hover:border-slate-500"
-                        }`}
-                      >
-                        <Upload className="text-slate-450 mb-2 animate-pulse" size={32} />
-                        <span className="text-sm font-semibold text-slate-300 mb-1">인터넷 브라우저 사진 끌어놓기</span>
-                        <span className="text-xs text-slate-500 mb-3">(페트병, 캔, 종이 등 사진 업로드 가능)</span>
-                        <label className="px-4 py-1.5 bg-yellow-450 text-slate-900 rounded-full text-xs font-bold ring-2 ring-yellow-400 cursor-pointer hover:bg-yellow-400">
-                          파일 선택하기
-                          <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-                        </label>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <video
-                        ref={videoRef}
-                        playsInline
-                        muted
-                        className="w-full h-full object-cover min-h-[280px]"
-                        style={{ transform: "scaleX(-1)" }}
-                      />
-                      
-                      {/* Hands-Free Automated Capture Countdown Overlay */}
-                      {autoScanCountdown !== null && (
-                        <div className="absolute inset-0 bg-black/45 backdrop-blur-[1.5px] flex flex-col items-center justify-center z-30 pointer-events-none animate-fade-in">
-                          <div className="bg-slate-900/95 border-3 border-emerald-400 p-5 rounded-3xl flex flex-col items-center justify-center shadow-2xl max-w-xs text-center">
-                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-1">🤖 인공지능 자동 물체 스캐너</span>
-                            <div className="flex items-center space-x-3 mb-2.5">
-                              <div className="w-14 h-14 bg-emerald-400 text-slate-950 font-black rounded-full flex items-center justify-center text-3xl shadow-lg border-2 border-white animate-pulse">
-                                {autoScanCountdown}
-                              </div>
-                              <span className="text-sm font-black text-white text-left">초 후에<br />자동으로 찰칵! 📸</span>
-                            </div>
-                            <span className="text-[10px] text-slate-300 leading-normal">카메라 앞에 분리수거 대상을 비추고 잠시 멈춰 기다려주세요!</span>
-                          </div>
+            /* Camera/Upload Mode with 50/50 split */
+            <div className="flex-1 flex flex-col p-4 relative justify-between items-stretch gap-4 h-full min-h-[500px]">
+              {/* Top part: Camera preview screen */}
+              <div className="flex-1 min-h-[220px] flex flex-col items-center justify-center relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-inner p-2">
+                {uploadPreview ? (
+                  /* Photo preview and cancel */
+                  <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                    <img
+                      src={uploadPreview}
+                      alt="Scan snapshot"
+                      className="h-[140px] rounded-lg border border-slate-700 object-contain shadow-lg"
+                    />
+                    <button
+                      onClick={() => {
+                        sounds.playPop();
+                        setUploadPreview(null);
+                        setAiFeedback(null);
+                        setAutoScanCountdown(5); // Reset automated snapshot countdown!
+                        startCamera();
+                      }}
+                      className="mt-2.5 flex items-center space-x-1.5 px-3.5 py-1.5 bg-slate-800 text-xs hover:bg-slate-700 text-yellow-300 rounded-full transition"
+                    >
+                      <RefreshCw size={13} />
+                      <span>다시 촬영하기</span>
+                    </button>
+                  </div>
+                ) : (
+                  /* Live Video Window */
+                  <div className="w-full h-full flex flex-col items-center justify-center relative bg-black rounded-xl overflow-hidden">
+                    {cameraError ? (
+                      <div className="p-4 text-center max-w-sm">
+                        <p className="text-yellow-400 text-xs mb-3">{cameraError}</p>
+                        
+                        {/* Drag & Drop Area */}
+                        <div
+                          onDragEnter={handleDrag}
+                          onDragOver={handleDrag}
+                          onDragleave={handleDrag}
+                          onDrop={handleDrop}
+                          className={`w-full p-6 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all ${
+                            dragActive ? "border-yellow-450 bg-slate-900" : "border-slate-700 hover:border-slate-500"
+                          }`}
+                        >
+                          <Upload className="text-slate-450 mb-1.5 animate-pulse" size={24} />
+                          <span className="text-xs font-semibold text-slate-300 mb-0.5">인터넷 브라우저 사진 끌어놓기</span>
+                          <span className="text-[10px] text-slate-500 mb-2.5">(페트병, 캔, 종이 등 사진 업로드 가능)</span>
+                          <label className="px-3.5 py-1.5 bg-yellow-450 text-slate-900 rounded-full text-[10px] font-bold ring-2 ring-yellow-400 cursor-pointer hover:bg-yellow-400">
+                            파일 선택하기
+                            <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                          </label>
                         </div>
-                      )}
-
-                      {/* Scan grid mask */}
-                      <div className="absolute inset-x-8 top-1/4 bottom-1/4 border border-yellow-350/30 rounded flex items-center justify-center pointer-events-none z-10">
-                        <div className="w-full h-[2px] bg-yellow-400 opacity-60 absolute animate-pulse" />
-                        <span className="text-[10px] text-yellow-350/70 bg-slate-900/80 px-2 py-0.5 rounded-full absolute bottom-2">분리수거 물건을 비춰주세요</span>
                       </div>
+                    ) : (
+                      <>
+                        <video
+                          ref={videoRef}
+                          playsInline
+                          muted
+                          className="w-full h-full object-cover min-h-[160px]"
+                          style={{ transform: "scaleX(-1)" }}
+                        />
+                        
+                        {/* Hands-Free Automated Capture Countdown Overlay */}
+                        {autoScanCountdown !== null && (
+                          <div className="absolute inset-0 bg-black/45 backdrop-blur-[1.5px] flex flex-col items-center justify-center z-30 pointer-events-none animate-fade-in">
+                            <div className="bg-slate-900/95 border-2 border-emerald-400 p-3.5 rounded-2xl flex flex-col items-center justify-center shadow-2xl max-w-xs text-center">
+                              <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block mb-0.5">🤖 자동 물체 스캐너</span>
+                              <div className="flex items-center space-x-2.5 mb-1.5">
+                                <div className="w-10 h-10 bg-emerald-400 text-slate-950 font-black rounded-full flex items-center justify-center text-xl shadow-lg border-2 border-white animate-pulse">
+                                  {autoScanCountdown}
+                                </div>
+                                <span className="text-xs font-black text-white text-left">{autoScanCountdown}초 후에<br />자동 찰칵! 📸</span>
+                              </div>
+                              <span className="text-[9px] text-slate-440 leading-tight">카메라 앞에 대상을 비추고 잠시 가만히 멈춰주세요!</span>
+                            </div>
+                          </div>
+                        )}
 
-                      {/* Snap Action Button */}
-                      <button
-                        onClick={capturePhoto}
-                        id="btn-camera-snap"
-                        className="absolute bottom-4 px-6 py-3 bg-yellow-400 hover:bg-yellow-350 text-slate-950 font-bold rounded-full flex items-center space-x-2 shadow-2xl scale-110 active:scale-95 transition z-10"
-                      >
-                        <Camera size={18} />
-                        <span>찰칵! 촬영하기</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
-              
+                        {/* Scan grid mask */}
+                        <div className="absolute inset-x-8 top-1/6 bottom-1/6 border border-yellow-350/30 rounded flex items-center justify-center pointer-events-none z-10">
+                          <div className="w-full h-[1.5px] bg-yellow-400 opacity-60 absolute animate-pulse" />
+                          <span className="text-[9px] text-yellow-350/70 bg-slate-900/85 px-2 py-0.5 rounded-full absolute bottom-1.5">분리수거 물건을 비춰주세요</span>
+                        </div>
+
+                        {/* Snap Action Button */}
+                        <button
+                          onClick={capturePhoto}
+                          id="btn-camera-snap"
+                          className="absolute bottom-3 px-4 py-2 bg-yellow-400 hover:bg-yellow-350 text-slate-950 font-bold rounded-full flex items-center space-x-1.5 shadow-2xl scale-105 active:scale-95 transition z-10 text-xs"
+                        >
+                          <Camera size={14} />
+                          <span>찰칵! 촬영하기</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <canvas ref={canvasRef} className="hidden" />
 
-              {/* Sample recyclable generator cards for debug/convenience */}
-              <div className="w-full mt-4 bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                <span className="text-xs font-semibold text-slate-400 block mb-2 text-center">💡 소품이 없을 때 빠른 체험용 샘플 카드:</span>
-                <div className="grid grid-cols-5 gap-2">
+              {/* Bottom part: Sample cards container */}
+              <div className="flex-1 min-h-[220px] bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <span className="text-xs font-black text-emerald-400 block mb-1 text-center">💡 소품이 없을 때 빠른 체험용 샘플 카드:</span>
+                  <p className="text-[10px] text-slate-400 text-center mb-2">
+                    아래 카드 중 하나를 선택하면 실제로 돋보기로 촬영한 것과 똑같이 인공지능이 멋지게 분석해 줘요!
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-5 gap-2.5 flex-1 items-stretch">
                   {SAMPLE_RECYCLABLES.map((sample, idx) => (
                     <button
                       key={idx}
@@ -622,10 +631,11 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                           setIsAnalyzing(false);
                         }
                       }}
-                      className="flex flex-col items-center justify-center py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-750 hover:border-slate-600 rounded-lg text-xs transition"
+                      className="flex flex-col items-center justify-center p-2 bg-slate-850 hover:bg-slate-800 border border-slate-750 hover:border-emerald-400/60 rounded-xl transition-all duration-200 hover:-translate-y-1 shadow-md group relative overflow-hidden"
                     >
-                      <span className="text-xl">{sample.emoji}</span>
-                      <span className="font-medium text-slate-300 mt-0.5">{sample.name}</span>
+                      <div className="text-3xl mb-1 transform group-hover:scale-115 transition duration-200">{sample.emoji}</div>
+                      <span className="font-extrabold text-slate-200 text-xs truncate w-full text-center">{sample.name}</span>
+                      <span className="text-[8px] font-bold text-slate-450 mt-1 block px-1 py-0.5 bg-slate-900/50 rounded-md">샘플카드 📸</span>
                     </button>
                   ))}
                 </div>
