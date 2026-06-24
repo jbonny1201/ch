@@ -169,7 +169,8 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
         body: JSON.stringify({
           image: imageData,
           mimeType: "image/png",
-          itemHint: item.category
+          itemHint: item.category,
+          isSample: true
         }),
       });
 
@@ -598,7 +599,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                           const res = await fetch("/api/analyze-trash", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ image: sample.data, mimeType: "image/png", itemHint: sample.category })
+                            body: JSON.stringify({ image: sample.data, mimeType: "image/png", itemHint: sample.category, isSample: true })
                           });
                           if (res.ok) {
                             const data = await res.json();

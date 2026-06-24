@@ -3,6 +3,7 @@ import { Participant, STICKER_LIST } from "../types";
 import { sounds } from "../utils/audio";
 import { Trash2, UserPlus, Award, Zap, Printer, Compass, Sparkles, Volume2, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import GreenTrashTruck from "./GreenTrashTruck";
 
 interface TeacherDashboardProps {
   participants: Participant[];
@@ -384,7 +385,9 @@ export default function TeacherDashboard({ participants, onAddParticipant, onCle
                 }`}
               >
                 <div>
-                  <span className="font-extrabold block text-xs">🚛 쓰레기차 댄스 타임</span>
+                  <span className="font-extrabold flex items-center gap-1 text-xs">
+                    <GreenTrashTruck size={16} /> 쓰레기차 댄스 타임
+                  </span>
                   <span className="text-[10px] opacity-80">춤추는 로봇 쓰레기차</span>
                 </div>
                 <span className="text-xl">{goalProgressPercent >= 100 ? "🔓" : "🔒"}</span>
@@ -537,12 +540,12 @@ export default function TeacherDashboard({ participants, onAddParticipant, onCle
                 <div className="relative w-48 h-48 mx-auto flex items-center justify-center mb-6">
                   <div className="absolute inset-0 bg-yellow-400/20 blur-xl rounded-full scale-125 animate-pulse" />
                   
-                  {/* Visual mechanical cute truck rotating and swinging */}
-                  <div className="text-8xl animate-bounce filter drop-shadow-xl select-none duration-130 transform rotate-12 scale-110">
-                    🚛
+                  {/* Visual mechanical cute truck rotating and swinging gently without bouncing */}
+                  <div className="w-32 h-28 animate-pulse filter drop-shadow-xl select-none duration-130 transform rotate-6 scale-110">
+                    <GreenTrashTruck size="100%" />
                   </div>
                   <div className="absolute top-0 right-0 text-3xl animate-ping text-yellow-450 font-black">⚡</div>
-                  <div className="absolute bottom-2 left-0 text-3xl animate-bounce text-pink-500">❤️</div>
+                  <div className="absolute bottom-2 left-0 text-3xl animate-pulse text-pink-500">❤️</div>
                 </div>
 
                 <h4 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-indigo-400">

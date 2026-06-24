@@ -5,28 +5,15 @@ import ClassroomExplorer from "./components/ClassroomExplorer";
 import MonsterHunt from "./components/MonsterHunt";
 import TeacherDashboard from "./components/TeacherDashboard";
 import StickerBook from "./components/StickerBook";
+import GreenTrashTruck from "./components/GreenTrashTruck";
 import { 
   Trophy, Award, Users, Trash2, Camera, ShieldAlert, Sparkles, 
   Trash, Heart, Play, RefreshCw, Zap, Volume2, User
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
-// Pre-populate 13 starter kids for the classroom, perfectly sized for 13 participants!
-const DEFAULT_STUDENTS: Participant[] = [
-  { id: "stud-1", name: "하준이 🧒", scanCount: 3, captureCount: 4, totalScore: 70, unlockedStickers: ["moon_sticker", "recycling_king"], createdAt: new Date().toISOString() },
-  { id: "stud-2", name: "지우 👧", scanCount: 5, captureCount: 6, totalScore: 110, unlockedStickers: ["moon_sticker", "recycling_king", "victory_hero"], createdAt: new Date().toISOString() },
-  { id: "stud-3", name: "민우 🧒", scanCount: 1, captureCount: 2, totalScore: 30, unlockedStickers: ["moon_sticker"], createdAt: new Date().toISOString() },
-  { id: "stud-4", name: "서아 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-5", name: "예준이 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-6", name: "수아 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-7", name: "도윤이 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-8", name: "서윤이 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-9", name: "시우 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-10", name: "하은이 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-11", name: "지호 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-12", name: "지유 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
-  { id: "stud-13", name: "준우 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() }
-];
+// Pre-populate empty array so the user can add custom children in the app!
+const DEFAULT_STUDENTS: Participant[] = [];
 
 export default function App() {
   // Game control states
@@ -56,15 +43,17 @@ export default function App() {
         setParticipants(parsed);
         if (parsed.length > 0) {
           setActiveStudentId(parsed[0].id);
+        } else {
+          setActiveStudentId("");
         }
       } catch (e) {
         setParticipants(DEFAULT_STUDENTS);
-        setActiveStudentId(DEFAULT_STUDENTS[0].id);
+        setActiveStudentId(DEFAULT_STUDENTS.length > 0 ? DEFAULT_STUDENTS[0].id : "");
       }
     } else {
       // Empty, load pre-populate
       setParticipants(DEFAULT_STUDENTS);
-      setActiveStudentId(DEFAULT_STUDENTS[0].id);
+      setActiveStudentId(DEFAULT_STUDENTS.length > 0 ? DEFAULT_STUDENTS[0].id : "");
       localStorage.setItem("earth_star_recycling_participants", JSON.stringify(DEFAULT_STUDENTS));
     }
 
@@ -357,11 +346,13 @@ export default function App() {
           <div className="absolute top-0 right-1/4 text-4xl animate-puff-1 select-none pointer-events-none">💨</div>
           <div className="absolute top-4 right-1/3 text-3xl animate-puff-2 select-none pointer-events-none">💨</div>
           
-          {/* Sad crying trash truck - gentle wiggle instead of jumping bounce */}
-          <div className="text-[120px] filter saturate-50 brightness-75 translate-y-1 select-none animate-pulse duration-1000">
-            🚛
+          {/* Side-by-side truck and emoji */}
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-[140px] h-[112px] filter saturate-50 brightness-75 translate-y-1 select-none animate-pulse duration-1000">
+              <GreenTrashTruck size="100%" />
+            </div>
+            <span className="text-5xl animate-bounce select-none">😭</span>
           </div>
-          <span className="text-4xl absolute bottom-1/3 left-1/2 transform -translate-x-1/2 select-none">😭</span>
           
           <span className="mt-2 text-xs bg-[#FEE2E2] text-[#EF4444] px-4 py-1 border-2 border-[#FCA5A5] rounded-full font-black shadow-sm">
             고장난 상태... 연기가 올라와요 💔
@@ -376,11 +367,13 @@ export default function App() {
           {/* Tiny wind puffs */}
           <div className="absolute top-2 right-1/4 text-xl opacity-60 select-none pointer-events-none">💨</div>
           
-          {/* Subtle vibration wiggle body */}
-          <div className="text-[120px] transition duration-500 animate-float select-none">
-            🚛
+          {/* Side-by-side truck and emoji */}
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-[140px] h-[112px] transition duration-500 animate-float select-none">
+              <GreenTrashTruck size="100%" className="filter saturate-75" />
+            </div>
+            <span className="text-5xl select-none">🥺</span>
           </div>
-          <span className="text-4xl absolute bottom-1/3 left-1/2 transform -translate-x-1/2 select-none">🥺</span>
           
           <span className="mt-2 text-xs bg-[#FEF3C7] text-[#D97706] px-4 py-1 border-2 border-[#FCD34D] rounded-full font-black shadow-sm">
             조금씩 움직이기 시작했어요! ⚙️
@@ -396,13 +389,16 @@ export default function App() {
           <div className="absolute bottom-[40px] left-[15px] w-12 h-12 bg-yellow-300 opacity-65 rounded-full blur-md animate-ping pointer-events-none" />
           <div className="absolute bottom-[40px] right-[15px] w-12 h-12 bg-yellow-300 opacity-65 rounded-full blur-md animate-ping pointer-events-none" />
  
-          <div className="text-[120px] scale-103 select-none animate-float">
-            🚛
+          {/* Side-by-side truck and emoji */}
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-[140px] h-[112px] scale-103 select-none animate-float">
+              <GreenTrashTruck size="100%" />
+            </div>
+            <span className="text-5xl select-none">😮</span>
           </div>
-          <span className="text-3xl absolute bottom-[45px] left-1/2 transform -translate-x-1/2 bg-yellow-400 border border-yellow-300/50 text-slate-900 px-1 py-0.5 rounded text-[9px] font-black pointer-events-none uppercase tracking-widest leading-none">
+          <span className="text-3xl absolute bottom-[45px] left-1/3 transform -translate-x-1/2 bg-yellow-400 border border-yellow-300/50 text-slate-900 px-1 py-0.5 rounded text-[9px] font-black pointer-events-none uppercase tracking-widest leading-none">
             LIGHTS ON
           </span>
-          <span className="text-4xl absolute bottom-1/3 left-1/2 transform -translate-x-1/2">😮</span>
  
           <span className="mt-2 text-xs bg-[#E0F2FE] text-[#0369A1] px-4 py-1 border-2 border-[#7DD3FC] rounded-full font-black shadow-sm flex items-center space-x-1">
             <span className="h-2 w-2 rounded-full bg-[#3B82F6] animate-pulse" />
@@ -419,10 +415,13 @@ export default function App() {
           <div className="absolute -top-4 left-1/4 text-2xl animate-pulse">⭐</div>
           <div className="absolute top-2 right-1/4 text-2xl animate-ping">✨</div>
  
-          <div className="text-[120px] scale-105 select-none animate-float">
-            🚛
+          {/* Side-by-side truck and emoji */}
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-[140px] h-[112px] scale-105 select-none animate-float">
+              <GreenTrashTruck size="100%" />
+            </div>
+            <span className="text-5xl select-none animate-bounce">😀</span>
           </div>
-          <span className="text-4xl absolute bottom-1/3 left-1/2 transform -translate-x-1/2">😀</span>
  
           <span className="mt-2 text-xs bg-[#ECFDF5] text-[#059669] px-4 py-1 border-2 border-[#6EE7B7] rounded-full font-black shadow-sm">
             쌩쌩 웃는 얼굴로 달릴 수 있어요! 😊
@@ -439,10 +438,13 @@ export default function App() {
           <div className="absolute top-2 left-6 text-2xl animate-ping text-pink-500">❤️</div>
           <div className="absolute top-0 right-6 text-2xl animate-ping text-yellow-300">⭐</div>
  
-          <div className="text-[120px] scale-110 select-none animate-float filter drop-shadow-2xl">
-            🚛
+          {/* Side-by-side truck and emoji */}
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-[140px] h-[112px] scale-110 select-none animate-float filter drop-shadow-2xl">
+              <GreenTrashTruck size="100%" />
+            </div>
+            <span className="text-5xl select-none animate-bounce">🥳</span>
           </div>
-          <span className="text-4xl absolute bottom-1/3 left-1/2 transform -translate-x-1/2">🥳</span>
  
           <span className="mt-2 text-xs bg-[#FEF3C7] text-[#B45309] font-black px-4 py-1.5 rounded-full animate-pulse shadow-md border-2 border-[#FCD34D]">
             👑 완전 회복! 땅별마을 영웅 쓰레기차 🌟
@@ -466,7 +468,7 @@ export default function App() {
           </div>
           <div>
             <h2 onClick={() => sounds.playChime()} className="text-lg md:text-xl font-black tracking-tight text-[#0F172A] cursor-pointer hover:scale-[1.01] transition-transform flex items-center gap-1.5">
-              땅별마을 분리수거 챌린지 🚛
+              땅별마을 분리수거 챌린지 <GreenTrashTruck size={30} className="inline-block" />
             </h2>
             <p className="text-[11px] text-[#64748B] font-bold">지구를 지켜주고 고장 난 쓰레기차의 에너지를 모으자!</p>
           </div>
@@ -510,7 +512,7 @@ export default function App() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
-              className="max-w-xl mx-auto w-full p-8 my-10 bg-white rounded-[2.5rem] border-4 border-[#3B82F6] shadow-2xl relative text-center overflow-hidden bg-gradient-to-b from-[#E0F2FE] via-white to-white"
+              className="max-w-3xl mx-auto w-full p-8 my-10 bg-white rounded-[2.5rem] border-4 border-[#3B82F6] shadow-2xl relative text-center overflow-hidden bg-gradient-to-b from-[#E0F2FE] via-white to-white"
             >
               <div className="absolute top-2 left-2 text-6xl opacity-10 pointer-events-none">🌕</div>
               
@@ -529,10 +531,12 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Broken down dirty sad truck visual */}
-              <div className="flex items-center justify-center space-x-3 my-4 p-4 bg-[#FEE2E2] border-2 border-[#FCA5A5] rounded-2xl max-w-sm mx-auto shadow-sm">
-                <span className="text-4xl animate-bounce">🚛</span>
-                <span className="text-4xl">😭</span>
+              {/* Broken down dirty sad truck visual - expanded to wide rectangle with crying emoji */}
+              <div className="flex items-center justify-center space-x-4 my-4 p-4 bg-[#FEE2E2] border-2 border-[#FCA5A5] rounded-2xl max-w-md mx-auto shadow-sm">
+                <div className="w-16 h-12 shrink-0 animate-pulse">
+                  <GreenTrashTruck size="100%" className="filter saturate-50 brightness-75" />
+                </div>
+                <span className="text-4xl select-none animate-bounce">😭</span>
                 <div className="text-left">
                   <span className="text-xs text-[#EF4444] font-black block leading-none">고장난 쓰레기차</span>
                   <span className="text-[11px] text-[#991B1B] font-bold mt-1 block">현재 엔진 축전력: 10% 미만</span>
@@ -544,34 +548,83 @@ export default function App() {
                 <label className="block text-xs text-[#1E3A8A] font-black mb-2.5 text-center bg-blue-100/50 py-1 rounded-lg">
                   👇 아래 명단에서 내 이름을 찾아서 콕! 터치해 주세요 👇
                 </label>
-                <div className="grid grid-cols-3 gap-2 max-h-[140px] overflow-y-auto p-2 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200">
-                  {participants.map(p => {
-                    const isActive = p.id === activeStudentId;
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => {
-                          sounds.playChime();
-                          setActiveStudentId(p.id);
-                          sounds.speak(`${p.name.replace(/[🧒👧🌟]/g, "").trim()} 친구 반가워요! 대작전 시작!`);
-                          setGameMode("MAIN");
-                        }}
-                        className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all cursor-pointer ${
-                          isActive
-                            ? "bg-[#3B82F6] text-white border-[#2563EB] scale-103 shadow-md"
-                            : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                        }`}
+                <div className="grid grid-cols-5 gap-2 max-h-[140px] overflow-y-auto p-2 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200">
+                  {participants.length === 0 ? (
+                    <div className="col-span-5 text-center py-6 px-4 text-xs text-slate-500 font-bold">
+                      등록된 어린이 이름이 없어요! 아래에서 이름을 입력하고 추가해 주세요! 👇
+                    </div>
+                  ) : (
+                    participants.map(p => {
+                      const isActive = p.id === activeStudentId;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            sounds.playChime();
+                            setActiveStudentId(p.id);
+                            sounds.speak(`${p.name.replace(/[🧒👧🌟]/g, "").trim()} 친구 반가워요! 대작전 시작!`);
+                            setGameMode("MAIN");
+                          }}
+                          className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all cursor-pointer ${
+                            isActive
+                              ? "bg-[#3B82F6] text-white border-[#2563EB] scale-103 shadow-md"
+                              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span className="text-xl">
+                            {p.name.includes("👧") ? "👧" : "🧒"}
+                          </span>
+                          <span className="text-xs font-black mt-0.5 truncate max-w-full">
+                            {p.name.replace(/[🧒👧🌟]/g, "").trim()}
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Quick Add Name on Intro Page */}
+                <div className="mt-3 p-3 bg-blue-50 rounded-2xl border-2 border-blue-200/50">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const form = e.currentTarget;
+                      const input = form.elements.namedItem("quickName") as HTMLInputElement;
+                      const gender = form.elements.namedItem("genderSelect") as HTMLSelectElement;
+                      if (input && input.value.trim()) {
+                        const nameText = input.value.trim() + (gender.value === "girl" ? " 👧" : " 🧒");
+                        handleAddParticipant(nameText);
+                        input.value = "";
+                        sounds.playPop();
+                      }
+                    }}
+                    className="flex flex-col sm:flex-row items-center gap-2"
+                  >
+                    <span className="text-xs font-black text-[#1E3A8A] shrink-0">➕ 빠른 이름 추가:</span>
+                    <div className="flex flex-1 w-full gap-2">
+                      <input
+                        name="quickName"
+                        type="text"
+                        placeholder="이름 입력 (예: 민수, 민지)"
+                        maxLength={8}
+                        className="flex-1 px-3 py-1.5 text-xs border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-500 font-bold bg-white"
+                      />
+                      <select
+                        name="genderSelect"
+                        className="px-2 py-1.5 text-xs border-2 border-blue-200 rounded-xl font-bold bg-white focus:outline-none"
                       >
-                        <span className="text-xl">
-                          {p.name.includes("👧") ? "👧" : "🧒"}
-                        </span>
-                        <span className="text-xs font-black mt-0.5 truncate max-w-full">
-                          {p.name.replace(/[🧒👧🌟]/g, "").trim()}
-                        </span>
-                      </button>
-                    );
-                  })}
+                        <option value="boy">🧒 남자아이</option>
+                        <option value="girl">👧 여자아이</option>
+                      </select>
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto px-4 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-black rounded-xl transition shadow-md active:translate-y-0.5 shrink-0"
+                    >
+                      어린이 등록
+                    </button>
+                  </form>
                 </div>
                 
                 <div className="mt-2.5 flex justify-end">
@@ -579,13 +632,19 @@ export default function App() {
                     onClick={() => { sounds.playPop(); setGameMode("TEACHER"); }}
                     className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 text-[10px] rounded-lg font-bold transition shadow-sm"
                   >
-                    ➕ 내 이름 추가하기 (선생님)
+                    ⚙️ 전체 관리 및 인쇄 (선생님)
                   </button>
                 </div>
               </div>
 
               <button
                 onClick={() => {
+                  if (participants.length === 0) {
+                    sounds.playFail();
+                    sounds.speak("먼저 어린이를 등록해 주세요!");
+                    alert("먼저 어린이를 등록해 주세요!");
+                    return;
+                  }
                   sounds.playChime();
                   sounds.speak("대작전 시작! 뚝딱뚝딱 고치러 가보자!");
                   setGameMode("MAIN");

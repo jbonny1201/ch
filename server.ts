@@ -26,10 +26,68 @@ const ai = new GoogleGenAI({
 // API endpoint to analyze trash image
 app.post("/api/analyze-trash", async (req, res) => {
   try {
-    const { image, mimeType, itemHint } = req.body;
+    const { image, mimeType, itemHint, isSample } = req.body;
 
     if (!image) {
       return res.status(400).json({ error: "이미지 데이터가 필요합니다." });
+    }
+
+    // Is it a sample or classroom simulation click?
+    const isPlaceholderImage = image.length < 500 || isSample; 
+    if (isPlaceholderImage) {
+      const fallbacks: Record<string, any> = {
+        plastic: {
+          category: "plastic",
+          itemName: "맑은 생수 페트병",
+          recyclable: true,
+          points: 10,
+          childExplanation: "우와! 깨끗한 플라스틱 생수병이군요! 페트병의 비닐 상표 라벨스티커를 꼭 뜯어서 따로 분리수거하고, 찌그러뜨려서 플라스틱 수거함에 쏙 넣어주세요! 땅별마을이 환하게 미소지을 거예요!",
+          monsterName: "플라스틱 괴물"
+        },
+        paper: {
+          category: "paper",
+          itemName: "달콤한 과자 종이상자",
+          recyclable: true,
+          points: 10,
+          childExplanation: "우와! 과자를 담았던 이쁜 종이상자네요! 테이프나 철사 같은 다른 부품을 떼어내고 납작하게 꾹꾹 눌러서 종이 수거함에 예쁘게 담아주세요!",
+          monsterName: "종이 괴물"
+        },
+        can: {
+          category: "can",
+          itemName: "시원한 콜라 캔",
+          recyclable: true,
+          points: 15,
+          childExplanation: "짠! 시원한 음료수가 담겨있던 알루미늄 캔이네요! 내용물을 물로 가볍게 헹구고 발로 꾹 밟아서 납작하게 만든 후 캔 수거함에 쏙 버려주세요!",
+          monsterName: "캔 괴물"
+        },
+        milk_carton: {
+          category: "milk_carton",
+          itemName: "고소한 흰 우유팩",
+          recyclable: true,
+          points: 20,
+          childExplanation: "와! 영양만점 우유팩이네요! 다 마신 우유갑은 속을 물로 깨끗하게 헹군 뒤, 네모나게 활짝 펼쳐서 말려 전용 우유팩 수거함에 버려요! 소중한 화장지로 다시 태어난답니다!",
+          monsterName: "우유갑 괴물"
+        },
+        vinyl: {
+          category: "vinyl",
+          itemName: "투명 과일 비닐봉지",
+          recyclable: true,
+          points: 10,
+          childExplanation: "바스락바스락 비닐봉지군요! 비닐 안에 이물질이 남아있지 않게 확인하고 비닐류 전용 분리수거함에 바람을 빼서 납작하게 넣어주세요!",
+          monsterName: "비닐 괴물"
+        },
+        other: {
+          category: "other",
+          itemName: "남아있는 사과심",
+          recyclable: false,
+          points: 0,
+          childExplanation: "어라라! 먹다 남은 과일 씨앗이나 음식물은 일반 쓰레기통이나 음식물 쓰레기통에 고이 버려주어야 해요! 분리수거함에는 넣으면 안 된답니다!",
+          monsterName: "먼지 괴물"
+        }
+      };
+
+      const key = itemHint && fallbacks[itemHint] ? itemHint : "plastic";
+      return res.json(fallbacks[key]);
     }
 
     // Is the API key initialized?
@@ -163,8 +221,8 @@ CRITICAL CLASSIFICATION MAPPING LAWS:
 1. "milk_carton" (우유팩) is separate from general "paper" (종이). All milk and juice cartons with paperboard triangular shapes MUST be classified as "milk_carton".
 2. "vinyl" (비닐) is separate from "plastic" (플라스틱). Thin flexible bags and snack bags are "vinyl".
 3. Check the shape, color, text, and materials in the image. Give the correct category.
-4. If the image is a plain solid colored block, or you receive an itemHint, trust the itemHint context completely: "${itemHint || 'none'}".
-5. Answer in a loving, cute, conversational Korean tone suitable for a 5-year-old child! Use cute exclamation points and make them feel proud!`,
+4. If the image is ambiguous, blurry, dark, contains multiple things, or has solid/minimal colors, you MUST strongly lean on the user hint / context: "${itemHint || 'none'}".
+5. Answer in a loving, cute, conversational Korean tone suitable for a 5-year-old child! Use cute exclamation points and make them feel proud!${hintText}`,
     };
 
     const response = await ai.models.generateContent({
