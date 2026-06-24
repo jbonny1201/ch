@@ -11,11 +11,21 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
-// Pre-populate some starter kids so the teacher dashboard and selector don't look blank on fresh load!
+// Pre-populate 13 starter kids for the classroom, perfectly sized for 13 participants!
 const DEFAULT_STUDENTS: Participant[] = [
   { id: "stud-1", name: "하준이 🧒", scanCount: 3, captureCount: 4, totalScore: 70, unlockedStickers: ["moon_sticker", "recycling_king"], createdAt: new Date().toISOString() },
   { id: "stud-2", name: "지우 👧", scanCount: 5, captureCount: 6, totalScore: 110, unlockedStickers: ["moon_sticker", "recycling_king", "victory_hero"], createdAt: new Date().toISOString() },
-  { id: "stud-3", name: "민우 🧒", scanCount: 1, captureCount: 2, totalScore: 30, unlockedStickers: ["moon_sticker"], createdAt: new Date().toISOString() }
+  { id: "stud-3", name: "민우 🧒", scanCount: 1, captureCount: 2, totalScore: 30, unlockedStickers: ["moon_sticker"], createdAt: new Date().toISOString() },
+  { id: "stud-4", name: "서아 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-5", name: "예준이 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-6", name: "수아 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-7", name: "도윤이 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-8", name: "서윤이 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-9", name: "시우 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-10", name: "하은이 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-11", name: "지호 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-12", name: "지유 👧", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() },
+  { id: "stud-13", name: "준우 🧒", scanCount: 0, captureCount: 0, totalScore: 0, unlockedStickers: [], createdAt: new Date().toISOString() }
 ];
 
 export default function App() {
@@ -443,9 +453,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-200/60 flex items-center justify-center p-2 sm:p-4 select-none">
-      {/* Landscape Tablet Frame (Horizontal iPad Aspect Ratio Lock) */}
-      <div className="w-full max-w-[1024px] aspect-[4/3] min-h-[660px] md:h-[768px] bg-[#F0F9FF] text-[#1E293B] font-sans flex flex-col justify-between shadow-2xl rounded-[2.5rem] border-[10px] border-slate-800/90 overflow-y-auto relative">
+    <div className="min-h-screen bg-[#F0F9FF] flex items-center justify-center p-0 select-none overflow-hidden w-full">
+      {/* Landscape Tablet Frame (Borderless design perfectly sized for iPad landscape) */}
+      <div className="w-full max-w-[1024px] aspect-[4/3] h-full md:h-[768px] bg-[#F0F9FF] text-[#1E293B] font-sans flex flex-col justify-between overflow-hidden relative">
       
       {/* Navigation Top Header */}
       <h1 className="sr-only">땅별마을 분리수거 챌린지</h1>
@@ -490,7 +500,7 @@ export default function App() {
       </header>
 
       {/* Main Switch Router */}
-      <main className="flex-1">
+      <main className="flex-1 overflow-y-auto p-3 flex flex-col relative">
         <AnimatePresence mode="wait">
           
           {/* SCENE 1: STORY INTRUDER DIALOGUE */}
@@ -530,26 +540,46 @@ export default function App() {
               </div>
 
               {/* Enter simple name or lookup selection */}
-              <div className="mt-6 border-t-2 border-[#E2E8F0] pt-5 text-left">
-                <label className="block text-xs text-[#64748B] font-black mb-2 uppercase tracking-wider">
-                  먼저 참여하는 내 자랑스럽고 귀여운 이름을 알려주세요!
+              <div className="mt-5 border-t-2 border-[#E2E8F0] pt-4 text-left">
+                <label className="block text-xs text-[#1E3A8A] font-black mb-2.5 text-center bg-blue-100/50 py-1 rounded-lg">
+                  👇 아래 명단에서 내 이름을 찾아서 콕! 터치해 주세요 👇
                 </label>
-                <div className="flex gap-2.5">
-                  <select
-                    value={activeStudentId}
-                    onChange={(e) => setActiveStudentId(e.target.value)}
-                    className="flex-1 bg-white border-2 border-[#CBD5E1] p-3 rounded-xl text-xs font-black text-[#0F172A] focus:outline-none focus:border-[#3B82F6]"
-                  >
-                    {participants.map(p => (
-                      <option key={p.id} value={p.id}>{p.name} (에너지: {p.totalScore}⚡)</option>
-                    ))}
-                  </select>
-                  
+                <div className="grid grid-cols-3 gap-2 max-h-[140px] overflow-y-auto p-2 bg-[#F8FAFC] rounded-2xl border-2 border-slate-200">
+                  {participants.map(p => {
+                    const isActive = p.id === activeStudentId;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          sounds.playChime();
+                          setActiveStudentId(p.id);
+                          sounds.speak(`${p.name.replace(/[🧒👧🌟]/g, "").trim()} 친구 반가워요! 대작전 시작!`);
+                          setGameMode("MAIN");
+                        }}
+                        className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-[#3B82F6] text-white border-[#2563EB] scale-103 shadow-md"
+                            : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        <span className="text-xl">
+                          {p.name.includes("👧") ? "👧" : "🧒"}
+                        </span>
+                        <span className="text-xs font-black mt-0.5 truncate max-w-full">
+                          {p.name.replace(/[🧒👧🌟]/g, "").trim()}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <div className="mt-2.5 flex justify-end">
                   <button
                     onClick={() => { sounds.playPop(); setGameMode("TEACHER"); }}
-                    className="px-4 py-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#475569] border-2 border-[#CBD5E1] text-xs rounded-xl font-bold transition shadow-sm"
+                    className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 text-[10px] rounded-lg font-bold transition shadow-sm"
                   >
-                    아동 추가
+                    ➕ 내 이름 추가하기 (선생님)
                   </button>
                 </div>
               </div>

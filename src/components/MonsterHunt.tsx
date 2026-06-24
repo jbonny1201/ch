@@ -365,9 +365,10 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
 
   // Trigger capture via Hand motion overlap
   const triggerMotionCapture = (m: Monster) => {
-    if (m.isCaptured || !isPlaying.current || activeSortingMonster) return;
+    if (m.isCaptured || !isPlaying.current) return;
     
     sounds.playPop();
+    sounds.playCatch();
     sounds.playChime();
     
     // Scale percentages to pixels inside container frame
@@ -377,7 +378,6 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     const y = (m.y / 100) * stageHeight;
     
     setActiveSortingCoords({ x, y });
-    setActiveSortingMonster(m);
     
     const KoreanType = m.type === "plastic" ? "플라스틱 괴물" :
                        m.type === "paper" ? "종이 상자 괴물" :
@@ -385,7 +385,23 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                        m.type === "milk_carton" ? "우유팩 괴물" :
                        m.type === "vinyl" ? "비닐 괴물" : "일반 쓰레기 괴물";
                        
-    sounds.speak(`손 움직임으로 ${KoreanType}을 잡았습니다! 이 쓰레기는 어떤 수거함에 분리수거해야 지구를 지킬까요?`);
+    sounds.speak(`손 움직임으로 ${KoreanType}을 잡았습니다! +${m.points} 에너지 충전!`);
+
+    const popupId = `popup-${Date.now()}`;
+    setCapturePopups((prev) => [
+      ...prev,
+      { id: popupId, x, y, text: `잡았다! +${m.points}⚡` }
+    ]);
+    
+    setMonsters((prev) =>
+      prev.map((item) => (item.id === m.id ? { ...item, isCaptured: true } : item))
+    );
+    setScoreEarned((prev) => prev + m.points);
+    
+    // Self-delete splash text
+    setTimeout(() => {
+      setCapturePopups((prev) => prev.filter((p) => p.id !== popupId));
+    }, 1500);
   };
 
   // Real-time Hand cursor overlap test
@@ -408,9 +424,11 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
 
   // Capture touch/click action
   const handleCapture = (m: Monster, e: React.MouseEvent) => {
-    if (m.isCaptured || !isPlaying.current || activeSortingMonster) return;
+    if (m.isCaptured || !isPlaying.current) return;
     
     sounds.playPop();
+    sounds.playCatch();
+    sounds.playChime();
     
     // Save coordinate values for future splash animation
     const rect = e.currentTarget.parentElement?.getBoundingClientRect();
@@ -418,7 +436,6 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     const y = e.clientY - (rect?.top || 0);
     
     setActiveSortingCoords({ x, y });
-    setActiveSortingMonster(m);
     
     const KoreanType = m.type === "plastic" ? "플라스틱 괴물" :
                        m.type === "paper" ? "종이 상자 괴물" :
@@ -426,7 +443,23 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                        m.type === "milk_carton" ? "우유팩 괴물" :
                        m.type === "vinyl" ? "비닐 괴물" : "일반 쓰레기 괴물";
                        
-    sounds.speak(`앗! ${KoreanType}을 찾았어요! 이 쓰레기는 어떤 분리수거함에 버려야 할까요? 맞추면 추가 에너지를 얻을 수 있어요!`);
+    sounds.speak(`${KoreanType}을 콕 잡았습니다! +${m.points} 에너지 충전!`);
+
+    const popupId = `popup-${Date.now()}`;
+    setCapturePopups((prev) => [
+      ...prev,
+      { id: popupId, x, y, text: `잡았다! +${m.points}⚡` }
+    ]);
+    
+    setMonsters((prev) =>
+      prev.map((item) => (item.id === m.id ? { ...item, isCaptured: true } : item))
+    );
+    setScoreEarned((prev) => prev + m.points);
+    
+    // Self-delete splash text
+    setTimeout(() => {
+      setCapturePopups((prev) => prev.filter((p) => p.id !== popupId));
+    }, 1500);
   };
 
   const handleSortAnswer = (binType: CategoryType) => {
@@ -519,7 +552,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     if (allCaught && isPlaying.current) {
       isPlaying.current = false;
       sounds.playChime();
-      sounds.speak(`축하합니다! 눈부신 솜씨로 교실 바닥의 모든 쓰레기 괴물들을 남김없이 다 잡았어요!`);
+      sounds.speak(`축하합니다! 눈부신 솜씨로 쓰레기산의 모든 쓰레기 괴물들을 남김없이 다 잡았어요!`);
     }
   }, [allCaught]);
 
@@ -596,11 +629,12 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               className="flex flex-col items-center justify-center pointer-events-none transition-all duration-75"
             >
               {/* Glowing holographic radar ring */}
-              <div className="w-14 h-14 rounded-full border-4 border-dashed border-yellow-400 animate-spin absolute" style={{ animationDuration: "2.5s" }} />
-              <div className="w-10 h-10 bg-yellow-400/20 border-2 border-yellow-350 rounded-full animate-pulse absolute" />
-              <span className="text-3xl z-10 filter drop-shadow-md animate-bounce">✋</span>
-              <span className="absolute -bottom-8 bg-[#1e293b] border border-yellow-400/70 text-white font-sans text-[10px] font-black px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap">
-                지키미 손동작 ✋
+              <div className="w-16 h-16 rounded-full border-4 border-dashed border-emerald-400 animate-spin absolute" style={{ animationDuration: "2s" }} />
+              <div className="w-12 h-12 bg-emerald-500/20 border-2 border-emerald-400 rounded-full animate-pulse absolute" />
+              <span className="text-4xl z-10 filter drop-shadow-md animate-bounce">✋</span>
+              <span className="absolute -bottom-8 bg-slate-900 border-2 border-emerald-400 text-emerald-300 font-sans text-[10px] font-black px-2 py-0.5 rounded shadow-lg whitespace-nowrap flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
+                <span>지키미 동작 인식 중 ✋</span>
               </span>
             </div>
           )}
@@ -728,7 +762,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               <p className="text-slate-350 text-xs max-w-sm mt-1 mb-5 leading-relaxed">
                 {allCaught
                   ? "단 한마리도 놓치지 않고 깨끗이 잡았어요! 지구 수호대 어린이 최고에요!"
-                  : "괴물들이 교실 속으로 꼭꼭 숨었어요! 하지만 획득한 연료 에너지를 쓰레기차에 넣어볼게요!"}
+                  : "괴물들이 쓰레기산 속으로 꼭꼭 숨었어요! 하지만 획득한 연료 에너지를 쓰레기차에 넣어볼게요!"}
               </p>
 
               <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center space-x-4 mb-6">

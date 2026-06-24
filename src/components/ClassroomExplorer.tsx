@@ -79,7 +79,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
         cameraStream.getTracks().forEach((track) => track.stop());
       }
       const constraints = {
-        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } },
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
         audio: false
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -348,19 +348,19 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
               
               {/* Header inside simulator */}
               <div className="relative z-10 bg-slate-900/65 backdrop-blur-md px-4 py-2 rounded-xl text-center self-center border border-white/10 max-w-lg mt-2">
-                <span className="text-yellow-300 font-bold block">✨ 예쁜 땅별 어린이집 교실 ✨</span>
-                <span className="text-xs text-slate-200">숨겨진 분리수거 물품들을 하나씩 눌러서 탐색해봐요!</span>
+                <span className="text-yellow-300 font-bold block">✨ 땅별마을 쓰레기산 ✨</span>
+                <span className="text-xs text-slate-200">쓰레기산에 버려진 물품들을 하나씩 찾아서 터치해봐요!</span>
               </div>
 
               {/* Classroom Illustration and absolute pins */}
               <div className="relative w-full flex-1 min-h-[300px] border border-dashed border-sky-300/30 rounded-xl mt-4 overflow-hidden bg-gradient-to-tr from-sky-500/20 to-lime-500/10">
                 
-                {/* Classroom Furniture Labels for preschool theme */}
-                <span className="absolute top-24 left-10 text-xs bg-white/20 px-2 py-0.5 rounded text-white font-mono uppercase">책장 📚</span>
-                <span className="absolute top-36 right-16 text-xs bg-white/20 px-2 py-0.5 rounded text-white font-mono uppercase">피아노 🎹</span>
-                <span className="absolute bottom-24 left-12 text-xs bg-white/20 px-2 py-0.5 rounded text-white font-mono uppercase">장난감통 🧸</span>
-                <span className="absolute bottom-36 left-1/3 text-xs bg-white/20 px-2 py-0.5 rounded text-white font-mono uppercase">공부 책상 ✏️</span>
-                <span className="absolute bottom-16 right-1/4 text-xs bg-white/20 px-2 py-0.5 rounded text-white font-mono uppercase">폭신 소파 🛋️</span>
+                {/* Trash mountain visual markers */}
+                <span className="absolute top-24 left-10 text-xs bg-black/40 border border-yellow-400/45 px-2 py-0.5 rounded text-white font-mono uppercase">고철 더미 🔩</span>
+                <span className="absolute top-36 right-16 text-xs bg-black/40 border border-yellow-400/45 px-2 py-0.5 rounded text-white font-mono uppercase">폐가구 더미 🛋️</span>
+                <span className="absolute bottom-24 left-12 text-xs bg-black/40 border border-yellow-400/45 px-2 py-0.5 rounded text-white font-mono uppercase">비닐 언덕 🛍️</span>
+                <span className="absolute bottom-36 left-1/3 text-xs bg-black/40 border border-yellow-400/45 px-2 py-0.5 rounded text-white font-mono uppercase">플라스틱 산 🥤</span>
+                <span className="absolute bottom-16 right-1/4 text-xs bg-black/40 border border-yellow-400/45 px-2 py-0.5 rounded text-white font-mono uppercase">종이 상자 더미 📦</span>
 
                 {items.map((item) => (
                   <button
@@ -396,7 +396,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                 className="relative z-10 self-center mt-3 flex items-center space-x-1.5 px-3 py-1 bg-slate-800 text-xs text-slate-350 hover:text-white rounded-lg transition"
               >
                 <RefreshCw size={12} />
-                <span>교실 쓰레기 처음부터 다시 숨기기</span>
+                <span>쓰레기산 쓰레기 처음부터 다시 숨기기</span>
               </button>
             </div>
           ) : (
