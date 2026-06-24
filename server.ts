@@ -35,16 +35,58 @@ app.post("/api/analyze-trash", async (req, res) => {
     // Is the API key initialized?
     if (!process.env.GEMINI_API_KEY) {
       console.warn("⚠️ Warning: GEMINI_API_KEY is not defined in environment variables. Falling back to simulator.");
-      // If no key is configured, return fallback data based on a simple simulator to keep the app working seamlessly
-      return res.json({
-        category: "plastic",
-        itemName: "맑은 페트병 (시뮬레이터)",
-        recyclable: true,
-        points: 10,
-        childExplanation: "와! 페트병을 찾았어요! 비닐 라벨을 떼어내고 깨끗이 씻은 후에 찌그러뜨려서 플라스틱 수거함에 쏙 넣어주세요! 쓰레기차가 아주 행복해해요! (인증키 설정 시 더 정확해집니다)",
-        monsterName: "플라스틱 괴물",
-        simulated: true
-      });
+      
+      const fallbacks = [
+        {
+          category: "plastic",
+          itemName: "맑은 생수 페트병 (시뮬레이션)",
+          recyclable: true,
+          points: 10,
+          childExplanation: "우와! 깨끗한 플라스틱 생수병이군요! 페트병의 비닐 상표 라벨스티커를 꼭 뜯어서 따로 분리수거하고, 찌그러뜨려서 플라스틱 수거함에 쏙 넣어주세요! 땅별마을이 환하게 미소지을 거예요!",
+          monsterName: "플라스틱 괴물",
+          simulated: true
+        },
+        {
+          category: "paper",
+          itemName: "달콤한 과자 종이상자 (시뮬레이션)",
+          recyclable: true,
+          points: 10,
+          childExplanation: "우와! 과자를 담았던 이쁜 종이상자네요! 테이프나 철사 같은 다른 부품을 떼어내고 납작하게 꾹꾹 눌러서 종이 수거함에 예쁘게 담아주세요!",
+          monsterName: "종이 괴물",
+          simulated: true
+        },
+        {
+          category: "can",
+          itemName: "시원한 콜라 캔 (시뮬레이션)",
+          recyclable: true,
+          points: 15,
+          childExplanation: "짠! 시원한 음료수가 담겨있던 알루미늄 캔이네요! 내용물을 물로 가볍게 헹구고 발로 꾹 밟아서 납작하게 만든 후 캔 수거함에 쏙 버려주세요!",
+          monsterName: "캔 괴물",
+          simulated: true
+        },
+        {
+          category: "milk_carton",
+          itemName: "고소한 흰 우유팩 (시뮬레이션)",
+          recyclable: true,
+          points: 20,
+          childExplanation: "와! 영양만점 우유팩이네요! 다 마신 우유갑은 속을 물로 깨끗하게 헹군 뒤, 네모나게 활짝 펼쳐서 말려 전용 우유팩 수거함에 버려요! 소중한 화장지로 다시 태어난답니다!",
+          monsterName: "우유갑 괴물",
+          simulated: true
+        },
+        {
+          category: "vinyl",
+          itemName: "투명 과일 비닐봉지 (시뮬레이션)",
+          recyclable: true,
+          points: 10,
+          childExplanation: "바스락바스락 비닐봉지군요! 비닐 안에 이물질이 남아있지 않게 확인하고 비닐류 전용 분리수거함에 바람을 빼서 납작하게 넣어주세요!",
+          monsterName: "비닐 괴물",
+          simulated: true
+        }
+      ];
+
+      const randomIndex = Math.floor(Math.random() * fallbacks.length);
+      const chosenFallback = fallbacks[randomIndex];
+      return res.json(chosenFallback);
     }
 
     // Strip out base64 header if present

@@ -101,14 +101,43 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
     }
   };
 
+  const [autoScanCountdown, setAutoScanCountdown] = useState<number | null>(5);
+
   useEffect(() => {
     if (activeTab === "camera") {
       startCamera();
+      setAutoScanCountdown(5);
     } else {
       stopCamera();
+      setAutoScanCountdown(null);
     }
     return () => stopCamera();
   }, [activeTab]);
+
+  // Hands-free camera automatic scan ticker
+  useEffect(() => {
+    if (activeTab !== "camera" || uploadPreview || isAnalyzing || cameraError || !cameraStream) {
+      setAutoScanCountdown(null);
+      return;
+    }
+
+    if (autoScanCountdown === null) {
+      setAutoScanCountdown(5);
+      return;
+    }
+
+    if (autoScanCountdown === 0) {
+      setAutoScanCountdown(null);
+      capturePhoto();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setAutoScanCountdown((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [activeTab, uploadPreview, isAnalyzing, cameraError, cameraStream, autoScanCountdown]);
 
   // Clicked item in simulated library classroom
   const handleItemClick = (item: InteractiveTrashItem) => {
@@ -216,16 +245,55 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
     } catch (err: any) {
       console.error(err);
       sounds.playFail();
-      const fallbackResult: TrashScanResult = {
-        category: "plastic",
-        itemName: "실제 플라스틱 음료병",
-        recyclable: true,
-        points: 10,
-        childExplanation: "우와! 지구를 사랑하는 꼬마 친구! 플라스틱 병은 겉면에 비닐 스티커 라벨을 꼭 떼서 찌그러뜨려 플라스틱 수거함에 버려주세요!",
-        monsterName: "플라스틱 괴물"
-      };
+      
+      const fallbacks: TrashScanResult[] = [
+        {
+          category: "plastic",
+          itemName: "맑은 생수 페트병 (시뮬레이션)",
+          recyclable: true,
+          points: 10,
+          childExplanation: "우와! 깨끗한 플라스틱 생수병이군요! 페트병의 비닐 상표 라벨스티커를 꼭 뜯어서 따로 분리수거하고, 찌그러뜨려서 플라스틱 수거함에 쏙 넣어주세요! 땅별마을이 환하게 미소지을 거예요!",
+          monsterName: "플라스틱 괴물"
+        },
+        {
+          category: "paper",
+          itemName: "달콤한 과자 종이상자 (시뮬레이션)",
+          recyclable: true,
+          points: 10,
+          childExplanation: "우와! 과자를 담았던 이쁜 종이상자네요! 테이프나 철사 같은 다른 부품을 떼어내고 납작하게 꾹꾹 눌러서 종이 수거함에 예쁘게 담아주세요!",
+          monsterName: "종이 괴물"
+        },
+        {
+          category: "can",
+          itemName: "시원한 콜라 캔 (시뮬레이션)",
+          recyclable: true,
+          points: 15,
+          childExplanation: "짠! 시원한 음료수가 담겨있던 알루미늄 캔이네요! 내용물을 물로 가볍게 헹구고 발로 꾹 밟아서 납작하게 만든 후 캔 수거함에 쏙 버려주세요!",
+          monsterName: "캔 괴물"
+        },
+        {
+          category: "milk_carton",
+          itemName: "고소한 흰 우유팩 (시뮬레이션)",
+          recyclable: true,
+          points: 20,
+          childExplanation: "와! 영양만점 우유팩이네요! 다 마신 우유갑은 속을 물로 깨끗하게 헹군 뒤, 네모나게 활짝 펼쳐서 말려 전용 우유팩 수거함에 버려요! 소중한 화장지로 다시 태어난답니다!",
+          monsterName: "우유갑 괴물"
+        },
+        {
+          category: "vinyl",
+          itemName: "투명 과일 비닐봉지 (시뮬레이션)",
+          recyclable: true,
+          points: 10,
+          childExplanation: "바스락바스락 비닐봉지군요! 비닐 안에 이물질이 남아있지 않게 확인하고 비닐류 전용 분리수거함에 바람을 빼서 납작하게 넣어주세요!",
+          monsterName: "비닐 괴물"
+        }
+      ];
+
+      const randomIndex = Math.floor(Math.random() * fallbacks.length);
+      const fallbackResult = fallbacks[randomIndex];
       setAiFeedback(fallbackResult);
-      sounds.speak("실제 플라스틱 음료병을 찾았어요! 꼭 플라스틱 수거함에 쏙 넣어서 분리수거해 주세요!");
+      const binK = getBinNameInKorean(fallbackResult.category);
+      sounds.speak(`${fallbackResult.itemName}을 찾았어요! 꼭 ${binK}에 분리수거해 주세요!`);
     } finally {
       setIsAnalyzing(false);
     }
@@ -415,6 +483,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                       sounds.playPop();
                       setUploadPreview(null);
                       setAiFeedback(null);
+                      setAutoScanCountdown(5); // Reset automated snapshot countdown!
                       startCamera();
                     }}
                     className="mt-3 flex items-center space-x-2 px-4 py-2 bg-slate-800 text-sm hover:bg-slate-700 text-yellow-300 rounded-full"
@@ -458,8 +527,24 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                         className="w-full h-full object-cover min-h-[280px]"
                       />
                       
+                      {/* Hands-Free Automated Capture Countdown Overlay */}
+                      {autoScanCountdown !== null && (
+                        <div className="absolute inset-0 bg-black/45 backdrop-blur-[1.5px] flex flex-col items-center justify-center z-30 pointer-events-none animate-fade-in">
+                          <div className="bg-slate-900/95 border-3 border-emerald-400 p-5 rounded-3xl flex flex-col items-center justify-center shadow-2xl max-w-xs text-center">
+                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-1">🤖 인공지능 자동 물체 스캐너</span>
+                            <div className="flex items-center space-x-3 mb-2.5">
+                              <div className="w-14 h-14 bg-emerald-400 text-slate-950 font-black rounded-full flex items-center justify-center text-3xl shadow-lg border-2 border-white animate-bounce">
+                                {autoScanCountdown}
+                              </div>
+                              <span className="text-sm font-black text-white text-left">초 후에<br />자동으로 찰칵! 📸</span>
+                            </div>
+                            <span className="text-[10px] text-slate-300 leading-normal">카메라 앞에 분리수거 대상을 비추고 잠시 멈춰 기다려주세요!</span>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Scan grid mask */}
-                      <div className="absolute inset-x-8 top-1/4 bottom-1/4 border border-yellow-350/30 rounded flex items-center justify-center pointer-events-none">
+                      <div className="absolute inset-x-8 top-1/4 bottom-1/4 border border-yellow-350/30 rounded flex items-center justify-center pointer-events-none z-10">
                         <div className="w-full h-[2px] bg-yellow-400 opacity-60 absolute animate-pulse" />
                         <span className="text-[10px] text-yellow-350/70 bg-slate-900/80 px-2 py-0.5 rounded-full absolute bottom-2">분리수거 물건을 비춰주세요</span>
                       </div>
@@ -468,7 +553,7 @@ export default function ClassroomExplorer({ onScanSuccess, onClose }: ClassroomE
                       <button
                         onClick={capturePhoto}
                         id="btn-camera-snap"
-                        className="absolute bottom-4 px-6 py-3 bg-yellow-400 hover:bg-yellow-350 text-slate-950 font-bold rounded-full flex items-center space-x-2 shadow-2xl scale-110 active:scale-95 transition"
+                        className="absolute bottom-4 px-6 py-3 bg-yellow-400 hover:bg-yellow-350 text-slate-950 font-bold rounded-full flex items-center space-x-2 shadow-2xl scale-110 active:scale-95 transition z-10"
                       >
                         <Camera size={18} />
                         <span>찰칵! 촬영하기</span>

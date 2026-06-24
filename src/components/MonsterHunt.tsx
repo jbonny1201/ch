@@ -336,14 +336,14 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               const avgX = (sumX / totalMotionPixels / width) * 100;
               const avgY = (sumY / totalMotionPixels / height) * 100;
               
-              // Camera streams are typically mirrored. Mirror the X axis to create natural hand pointer feedback!
-              const mirroredX = 100 - avgX;
+              // Use unmirrored raw X coordinate so tracking perfectly follows unmirrored camera stream
+              const trackedX = avgX;
 
               setHandPos((prev) => {
-                if (!prev) return { x: mirroredX, y: avgY };
+                if (!prev) return { x: trackedX, y: avgY };
                 // Linear interpolation (Lerp) for silky smooth coordinates transition - increased to 0.45 for snappy follow
                 return {
-                  x: prev.x + (mirroredX - prev.x) * 0.45,
+                  x: prev.x + (trackedX - prev.x) * 0.45,
                   y: prev.y + (avgY - prev.y) * 0.45,
                 };
               });
@@ -667,7 +667,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
             <div
               key={`motion-dot-${idx}`}
               className="absolute w-2 h-2 bg-[#10B981]/50 border border-[#34D399]/40 rounded-full animate-ping pointer-events-none z-10"
-              style={{ left: `${100 - cell.x}%`, top: `${cell.y}%` }}
+              style={{ left: `${cell.x}%`, top: `${cell.y}%` }}
             />
           ))}
 
@@ -686,9 +686,14 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               {/* Glowing holographic radar ring */}
               <div className="w-16 h-16 rounded-full border-4 border-dashed border-emerald-400 animate-spin absolute" style={{ animationDuration: "2s" }} />
               <div className="w-12 h-12 bg-emerald-500/20 border-2 border-emerald-400 rounded-full animate-pulse absolute" />
+              
+              {/* High-visibility tracked point dot for instant parent/child verification */}
+              <div className="w-4 h-4 bg-rose-500 rounded-full border-2 border-white absolute animate-ping z-20" />
+              <div className="w-3 h-3 bg-rose-600 rounded-full border border-white absolute z-20 shadow-md" />
+
               <span className="text-4xl z-10 filter drop-shadow-md animate-bounce">✋</span>
               <span className="absolute -bottom-8 bg-slate-900 border-2 border-emerald-400 text-emerald-300 font-sans text-[10px] font-black px-2 py-0.5 rounded shadow-lg whitespace-nowrap flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
+                <span className="w-1.5 h-1.5 bg-[#EF4444] rounded-full animate-ping" />
                 <span>지키미 동작 인식 중 ✋</span>
               </span>
             </div>

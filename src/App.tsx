@@ -754,25 +754,6 @@ export default function App() {
                       <span className="text-2xl shrink-0 ml-1">👾</span>
                     </button>
                   </div>
-
-                  <div className="border-t-2 border-[#FDBA74]/30 pt-4 mt-4 space-y-2">
-                    <span className="text-[10px] text-[#9A3412] font-extrabold block uppercase tracking-wider">어린이 대결 결투장</span>
-                    
-                    {/* 2-Player Versus triggers */}
-                    <button
-                      onClick={() => {
-                        const p1 = prompt("첫 번째 어린이 선수의 이름을 입력하세요:", "지우");
-                        if (!p1) return;
-                        const p2 = prompt("두 번째 어린이 선수의 이름을 입력하세요:", "하준");
-                        if (!p2) return;
-                        startVersusChallenge(p1, p2);
-                      }}
-                      id="btn-trigger-vs"
-                      className="w-full py-3 bg-[#EC4899] border-4 border-[#BE185D] hover:bg-[#D946EF] text-white rounded-3xl font-black text-xs shadow-[0_5px_0_#BE185D] active:shadow-none active:translate-y-1 transition-all text-center flex items-center justify-center space-x-1.5 cursor-pointer"
-                    >
-                      <span>🏆 2인 대결 모드 시작하기</span>
-                    </button>
-                  </div>
                 </div>
 
               </div>
