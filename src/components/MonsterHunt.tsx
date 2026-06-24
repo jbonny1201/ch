@@ -144,8 +144,10 @@ const MONSTER_PROFILES: Record<CategoryType, { name: string; color: string; emoj
 
 export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCaptured, onClose }: MonsterHuntProps) {
   const [monsters, setMonsters] = useState<Monster[]>([]);
-  const [timeLeft, setTimeLeft] = useState(25); // Increased to 25 seconds for kid-friendly interaction
+  const [timeLeft, setTimeLeft] = useState(40); // Set to 40 seconds as requested!
   const [scoreEarned, setScoreEarned] = useState(0);
+  const [capturedCount, setCapturedCount] = useState(0); // Track total count of captured items
+  const [isGameOver, setIsGameOver] = useState(false); // Game over status indicator
   const [capturePopups, setCapturePopups] = useState<{ id: string; x: number; y: number; text: string }[]>([]);
   const requestRef = useRef<number | null>(null);
   const isPlaying = useRef(true);
@@ -198,27 +200,48 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     };
   }, []);
 
+  // Dedicated Countdown Timer
+  useEffect(() => {
+    if (isGameOver) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsGameOver(true);
+          isPlaying.current = false;
+          sounds.playChime();
+          sounds.speak(`와우! 시간이 다 되었어요! 무려 ${capturedCount}마리의 쓰레기들을 멋지게 퇴치했군요! 대단해요!`);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isGameOver, capturedCount]);
+
   // Initialize monsters
   useEffect(() => {
-    // Generate 5 active falling monsters.
+    // Generate 8 active falling monsters for abundance and fun!
     const list: Monster[] = [];
     const categories: CategoryType[] = ["plastic", "paper", "can", "milk_carton", "vinyl", "other"];
     
-    for (let i = 0; i < 5; i++) {
-      const matchType = i < 3 ? detectedCategory : categories[Math.floor(Math.random() * categories.length)];
+    for (let i = 0; i < 8; i++) {
+      const matchType = i < 4 ? detectedCategory : categories[Math.floor(Math.random() * categories.length)];
       const profile = MONSTER_PROFILES[matchType];
       
       list.push({
-        id: `monster-${i}-${Date.now()}`,
+        id: `monster-${i}-${Date.now()}-${Math.random()}`,
         type: matchType,
         name: profile.name,
         x: 10 + Math.random() * 80, // initial percentage x (10-90)
-        y: -10 - (Math.random() * 50), // staggered top start positions
-        scale: 1.0 + Math.random() * 0.3,
+        y: -15 - (Math.random() * 50), // staggered top start positions
+        scale: 1.1 + Math.random() * 0.25,
         isCaptured: false,
         points: matchType === detectedCategory ? 15 : 10,
         speedX: 0,
-        speedY: 0.6 + Math.random() * 0.5, // downward speed
+        speedY: 0.6 + Math.random() * 0.6, // downward speed
       });
     }
     setMonsters(list);
@@ -226,24 +249,10 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
     // Audio guidance
     sounds.playFail(); // Rumble sound for monster spawn
     setTimeout(() => {
-      sounds.speak(`반짝반짝 새로운 쓰레기들이 하늘에서 슬슬 내려옵니다! 카메라 앞에서 손들을 휙휙 흔들어서 쓰레기를 한 번 잡아보세요!`);
+      sounds.speak(`반짝반짝 쓰레기들이 하늘에서 내려옵니다! 카메라 앞에서 손을 흔들거나 직접 터치해서 제한시간 40초 동안 많이 잡아주세요!`);
     }, 400);
 
-    // Countdown Timer with automatic pause during active educational sorting
-    const timer = setInterval(() => {
-      if (timeLeft > 0 && isPlaying.current) {
-        if (!isSortingRef.current) {
-          setTimeLeft((prev) => prev - 1);
-        }
-      } else if (timeLeft === 0) {
-        isPlaying.current = false;
-        clearInterval(timer);
-      }
-    }, 1000);
-
     return () => {
-      clearInterval(timer);
-      isPlaying.current = false;
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [detectedCategory]);
@@ -309,8 +318,8 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                 const bDiff = Math.abs(data[idx + 2] - lastData[idx + 2]);
                 const totalDiff = rDiff + gDiff + bDiff;
 
-                // Threshold of change
-                if (totalDiff > 42) {
+                // Threshold of change - lowered to 25 to register subtle movements in kid-friendly environment
+                if (totalDiff > 25) {
                   totalMotionPixels++;
                   sumX += x;
                   sumY += y;
@@ -323,7 +332,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
             }
 
             // If there's enough movement, calculate motion centroid coordinates
-            if (totalMotionPixels > 12) {
+            if (totalMotionPixels > 8) {
               const avgX = (sumX / totalMotionPixels / width) * 100;
               const avgY = (sumY / totalMotionPixels / height) * 100;
               
@@ -332,10 +341,10 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
 
               setHandPos((prev) => {
                 if (!prev) return { x: mirroredX, y: avgY };
-                // Linear interpolation (Lerp) for silky smooth coordinates transition
+                // Linear interpolation (Lerp) for silky smooth coordinates transition - increased to 0.45 for snappy follow
                 return {
-                  x: prev.x + (mirroredX - prev.x) * 0.28,
-                  y: prev.y + (avgY - prev.y) * 0.28,
+                  x: prev.x + (mirroredX - prev.x) * 0.45,
+                  y: prev.y + (avgY - prev.y) * 0.45,
                 };
               });
 
@@ -385,18 +394,41 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                        m.type === "milk_carton" ? "우유팩 괴물" :
                        m.type === "vinyl" ? "비닐 괴물" : "일반 쓰레기 괴물";
                        
-    sounds.speak(`손 움직임으로 ${KoreanType}을 잡았습니다! +${m.points} 에너지 충전!`);
+    sounds.speak(`손으로 ${KoreanType} 퇴치! +${m.points} 에너지!`);
 
-    const popupId = `popup-${Date.now()}`;
+    const popupId = `popup-${Date.now()}-${Math.random()}`;
     setCapturePopups((prev) => [
       ...prev,
-      { id: popupId, x, y, text: `잡았다! +${m.points}⚡` }
+      { id: popupId, x, y, text: `퇴치! +${m.points}⚡` }
     ]);
     
-    setMonsters((prev) =>
-      prev.map((item) => (item.id === m.id ? { ...item, isCaptured: true } : item))
-    );
+    // Increment stats
+    setCapturedCount((prev) => prev + 1);
     setScoreEarned((prev) => prev + m.points);
+
+    // Swap captured monster immediately with a fresh randomized monster at the top of the stream!
+    setMonsters((prev) =>
+      prev.map((item) => {
+        if (item.id === m.id) {
+          const categories: CategoryType[] = ["plastic", "paper", "can", "milk_carton", "vinyl", "other"];
+          const matchType = categories[Math.floor(Math.random() * categories.length)];
+          const profile = MONSTER_PROFILES[matchType];
+          return {
+            id: `monster-${Date.now()}-${Math.random()}`,
+            type: matchType,
+            name: profile.name,
+            x: 10 + Math.random() * 80,
+            y: -15 - (Math.random() * 25), // Start above top boundary
+            scale: 1.1 + Math.random() * 0.25,
+            isCaptured: false,
+            points: matchType === detectedCategory ? 15 : 10,
+            speedX: 0,
+            speedY: 0.6 + Math.random() * 0.6,
+          };
+        }
+        return item;
+      })
+    );
     
     // Self-delete splash text
     setTimeout(() => {
@@ -414,7 +446,7 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
       const dx = m.x - handPos.x;
       const dy = m.y - handPos.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      return dist < 12; // hit radius 12%
+      return dist < 18; // Increased hit radius from 12% to 18% for much easier captures!
     });
 
     if (found) {
@@ -443,18 +475,41 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                        m.type === "milk_carton" ? "우유팩 괴물" :
                        m.type === "vinyl" ? "비닐 괴물" : "일반 쓰레기 괴물";
                        
-    sounds.speak(`${KoreanType}을 콕 잡았습니다! +${m.points} 에너지 충전!`);
+    sounds.speak(`터치로 ${KoreanType} 퇴치! +${m.points} 에너지!`);
 
-    const popupId = `popup-${Date.now()}`;
+    const popupId = `popup-${Date.now()}-${Math.random()}`;
     setCapturePopups((prev) => [
       ...prev,
-      { id: popupId, x, y, text: `잡았다! +${m.points}⚡` }
+      { id: popupId, x, y, text: `퇴치! +${m.points}⚡` }
     ]);
     
-    setMonsters((prev) =>
-      prev.map((item) => (item.id === m.id ? { ...item, isCaptured: true } : item))
-    );
+    // Increment stats
+    setCapturedCount((prev) => prev + 1);
     setScoreEarned((prev) => prev + m.points);
+
+    // Swap captured monster immediately with a fresh randomized monster at the top of the stream!
+    setMonsters((prev) =>
+      prev.map((item) => {
+        if (item.id === m.id) {
+          const categories: CategoryType[] = ["plastic", "paper", "can", "milk_carton", "vinyl", "other"];
+          const matchType = categories[Math.floor(Math.random() * categories.length)];
+          const profile = MONSTER_PROFILES[matchType];
+          return {
+            id: `monster-${Date.now()}-${Math.random()}`,
+            type: matchType,
+            name: profile.name,
+            x: 10 + Math.random() * 80,
+            y: -15 - (Math.random() * 25), // Start above top boundary
+            scale: 1.1 + Math.random() * 0.25,
+            isCaptured: false,
+            points: matchType === detectedCategory ? 15 : 10,
+            speedX: 0,
+            speedY: 0.6 + Math.random() * 0.6,
+          };
+        }
+        return item;
+      })
+    );
     
     // Self-delete splash text
     setTimeout(() => {
@@ -658,8 +713,8 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                     position: "absolute",
                     left: `${m.x}%`,
                     top: `${m.y}%`,
-                    width: `${65 * m.scale}px`,
-                    height: `${65 * m.scale}px`,
+                    width: `${90 * m.scale}px`, // Increased base size from 65px to 90px for larger click targets!
+                    height: `${90 * m.scale}px`,
                     cursor: "pointer",
                     zIndex: 20
                   }}
@@ -669,15 +724,23 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
                   className="transform -translate-x-1/2 -translate-y-1/2 transition-shadow duration-200"
                 >
                   {/* Glowing core */}
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-tr ${MONSTER_PROFILES[m.type].color} opacity-20 blur-xl scale-125`} />
+                  <div className={`absolute inset-0 rounded-full bg-gradient-to-tr ${MONSTER_PROFILES[m.type].color} opacity-35 blur-xl scale-125`} />
                   
-                  {/* SVG monster avatar */}
-                  {MONSTER_PROFILES[m.type].svg}
+                  {/* Container for styled SVG + high-contrast emoji overlay */}
+                  <div className="w-full h-full relative p-2 bg-slate-900/55 rounded-full border-2 border-white/30 backdrop-blur-sm shadow-xl flex items-center justify-center">
+                    {MONSTER_PROFILES[m.type].svg}
+                    
+                    {/* Extra clear, bouncing emoji bubble for immediate visual recognition! */}
+                    <div className="absolute -top-3.5 -right-3.5 w-10 h-10 rounded-full bg-white border-3 border-emerald-400 flex items-center justify-center text-xl shadow-lg z-30 animate-bounce">
+                      {MONSTER_PROFILES[m.type].emoji}
+                    </div>
+                  </div>
 
-                  {/* Little helper banner for children */}
-                  <span className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-950/80 border border-slate-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded text-yellow-300 pointer-events-none whitespace-nowrap">
-                    {m.name}
-                  </span>
+                  {/* Clean text banner for kids */}
+                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-950/90 border border-emerald-400 text-[11px] font-black px-2.5 py-0.5 rounded-full text-emerald-300 pointer-events-none whitespace-nowrap shadow-md flex items-center gap-1 z-30">
+                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                    <span>{m.name}</span>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -690,91 +753,37 @@ export default function MonsterHunt({ detectedCategory, monsterName, onMonsterCa
               initial={{ scale: 0.5, y: pop.y - 10, opacity: 1 }}
               animate={{ scale: 1.4, y: pop.y - 60, opacity: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
-              className="absolute font-sans font-extrabold text-yellow-400 text-lg pointer-events-none z-30"
+              className="absolute font-sans font-extrabold text-yellow-450 text-lg pointer-events-none z-30"
               style={{ left: pop.x - 30, top: pop.y }}
             >
               {pop.text}
             </motion.div>
           ))}
 
-          {/* Recycling sorting choice interactive modal overlay */}
-          <AnimatePresence>
-            {activeSortingMonster && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute inset-x-4 inset-y-4 rounded-xl bg-slate-950/95 border-2 border-yellow-400/55 z-40 flex flex-col items-center justify-center p-4 text-center overflow-y-auto"
-              >
-                {/* Visual feedback icon */}
-                <div className="relative mb-2.5 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-yellow-400/15 border-2 border-yellow-400 absolute animate-ping duration-1000" />
-                  <div className="w-12 h-12 rounded-full bg-slate-900 border-2 border-yellow-400 flex items-center justify-center text-2xl z-10">
-                    {MONSTER_PROFILES[activeSortingMonster.type].emoji}
-                  </div>
-                </div>
-
-                <h3 className="text-base font-extrabold text-white mb-0.5">
-                  🎉 {activeSortingMonster.name} 발견 완료!
-                </h3>
-                <p className="text-xs text-yellow-300 font-semibold mb-3">
-                  "이 피조물/쓰레기는 어디 분리수거함에 버려야 안전하게 정화될까요?"
-                </p>
-
-                {/* Bins selection grids */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 w-full max-w-md">
-                  {[
-                    { type: "plastic", label: "플라스틱 수거함", icon: "🥤", color: "bg-blue-600 hover:bg-blue-500 border-blue-450 text-white" },
-                    { type: "paper", label: "종이 수거함", icon: "📦", color: "bg-amber-600 hover:bg-amber-500 border-amber-550 text-white" },
-                    { type: "can", label: "캔류 수거함", icon: "🥫", color: "bg-emerald-600 hover:bg-emerald-500 border-emerald-550 text-white" },
-                    { type: "milk_carton", label: "우유팩 수거함", icon: "🥛", color: "bg-pink-600 hover:bg-pink-500 border-pink-500 text-white" },
-                    { type: "vinyl", label: "비닐 수거함", icon: "🛍️", color: "bg-purple-600 hover:bg-purple-500 border-purple-500 text-white" },
-                    { type: "other", label: "일반 쓰레기통", icon: "🗑️", color: "bg-slate-600 hover:bg-slate-500 border-slate-500 text-white" },
-                  ].map((bin) => (
-                    <button
-                      key={bin.type}
-                      onClick={() => handleSortAnswer(bin.type as CategoryType)}
-                      className={`flex flex-col items-center justify-center py-2 px-1.5 rounded-xl text-xs font-bold border-2 transition active:scale-95 space-y-1 shadow-lg cursor-pointer ${bin.color}`}
-                    >
-                      <span className="text-xl">{bin.icon}</span>
-                      <span>{bin.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <p className="text-[10px] text-slate-400 mt-3 max-w-xs leading-tight">
-                  올바른 수거함을 선택해 터치하면 에너지가 {activeSortingMonster.points}⚡ 충전되며, 달님이 고유 분리수거 방법을 이야기해 주실 거예요!
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Game Over / Win State Banner inside stage */}
-          {(!isPlaying.current || allCaught) && (
+          {/* Game Over State Banner inside stage */}
+          {isGameOver && (
             <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-30 p-6 text-center">
               <div className="p-4 bg-yellow-450/10 rounded-full border border-yellow-500/20 mb-4 text-5xl">
-                {allCaught ? "🏆" : "⌛"}
+                🏆
               </div>
               
               <h4 className="text-2xl font-black text-yellow-300">
-                {allCaught ? "우와! 괴물 물리치기 대성공!" : "시간이 마감되었어요!"}
+                시간이 마감되었어요!
               </h4>
-              <p className="text-slate-350 text-xs max-w-sm mt-1 mb-5 leading-relaxed">
-                {allCaught
-                  ? "단 한마리도 놓치지 않고 깨끗이 잡았어요! 지구 수호대 어린이 최고에요!"
-                  : "괴물들이 쓰레기산 속으로 꼭꼭 숨었어요! 하지만 획득한 연료 에너지를 쓰레기차에 넣어볼게요!"}
+              <p className="text-slate-300 text-xs max-w-sm mt-1 mb-5 leading-relaxed">
+                40초 동안 하늘에서 내려온 쓰레기들을 정말 열심히 분리 정화했군요! 지구 지키기 성공이에요!
               </p>
 
               <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center space-x-4 mb-6">
                 <div>
                   <span className="text-slate-500 text-[10px] block font-mono uppercase">획득한 보너스 연료</span>
-                  <span className="text-xl font-bold font-mono text-yellow-300">+{scoreEarned} 에너지고</span>
+                  <span className="text-xl font-bold font-mono text-yellow-300">+{scoreEarned} 에너지</span>
                 </div>
                 <div className="w-px h-8 bg-slate-700" />
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-mono">물리친 괴물 수</span>
-                  <span className="text-xl font-bold text-white">
-                    {monsters.filter((mon) => mon.isCaptured).length}마리 / {monsters.length}마리
+                  <span className="text-slate-500 text-[10px] block font-mono">물리친 쓰레기 괴물 수</span>
+                  <span className="text-xl font-bold text-emerald-400">
+                    {capturedCount}마리 퇴치 완료!
                   </span>
                 </div>
               </div>
